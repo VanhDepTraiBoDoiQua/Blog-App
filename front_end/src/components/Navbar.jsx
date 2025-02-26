@@ -1,20 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, useAuth, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const NavBar = () => {
     const [openMenu, setOpenMenu] = useState(false);
-    const {getToken} = useAuth();
-
-    useEffect(() => {
-        getToken().then((token) => console.log(token));
-    }, [])
 
     return (
         <div className="w-full h-16 md:h-20 flex items-center justify-between ">
             {/* LOGO */}
-            <Link to="/" className="flex items-center gap-4 text-2xl font-bold">
+            <Link to="/" className="flex items-center gap-4 text-2xl font-bold outline-none">
                 <Image src="logo.png" className="w-8 h-8" alt="Blog logo"/>
                 <span>Blog Platform</span>
             </Link>
@@ -24,9 +19,11 @@ const NavBar = () => {
                 <div className="cursor-pointer" 
                     onClick={() => setOpenMenu((prev) => !prev)}>
                     {openMenu ? (
-                        <img src="/closeMenu.png" className="w-8 h-8" alt="menu logo"/>
+                        // <img src="/closeMenu.png" className="w-8 h-8" alt="close menu logo"/>
+                        <Image src="closeMenu.png" className="w-8 h-8" alt="Blog logo"/>
                     ) : (
                         <img src="/menuLogo.png" className="w-8 h-8" alt="menu logo"/>
+                        // <Image src="menuLogo.png" className="w-8 h-8" alt="menu logo"/>
                     )}
                 </div>
 

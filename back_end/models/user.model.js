@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 
 const userSchema = new Schema(
     {
+        clerkId: {
+            type: String,
+        },
         clerkUserId: {
             type: String,
             required: true,

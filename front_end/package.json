@@ -12,11 +12,14 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.23.0",
     "@fontsource/montserrat": "^5.1.1",
+    "@tanstack/react-query": "^5.66.9",
+    "axios": "^1.7.9",
     "imagekitio-react": "^4.2.0",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-quill-new": "^3.3.3",
-    "react-router-dom": "^7.2.0"
+    "react-router-dom": "^7.2.0",
+    "react-toastify": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
