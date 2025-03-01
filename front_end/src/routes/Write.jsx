@@ -19,6 +19,22 @@ const Write = () => {
     const [progress, setProgress] = useState(0);
     const {getToken} = useAuth();
     const navigate = useNavigate();
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+        ['link', 'formula'],
+        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+        ['clean']                                         // remove formatting button
+    ]
 
     const mutation = useMutation({
         mutationFn: async (newPost) => {
@@ -53,8 +69,13 @@ const Write = () => {
             content: value,
         }
 
-        // send data to back-end
-        mutation.mutate(data);
+        if (data.image && data.title && data.category && data.description && data.content) {
+            // send data to back-end
+            mutation.mutate(data);
+        } else {
+            toast.error("Your post must contain Cover, Title, Description and Content!!");
+        }
+
     }
 
     useEffect(()=> {
@@ -77,7 +98,7 @@ const Write = () => {
 
     if (isLoaded && !isSignedIn) {
         return (
-            <div className="">You have to login first!</div>
+            <div className="text-2xl text-red-700 flex flex-row items-center justify-center my-20 font-extrabold">You have to login first!</div>
         )
     }
 
@@ -90,7 +111,7 @@ const Write = () => {
                 </Upload>
                 {
                     cover ? (
-                        <Image src={cover.filePath} className="rounded-2xl object-cover" w="600"/>
+                        <Image src={cover.filePath} className="rounded-2xl object-cover" w="200" h ="200"/>
                         ) : (
                             null
                         )
@@ -124,13 +145,16 @@ const Write = () => {
                         theme="snow" 
                         className="flex-1 rounded-xl bg-white shadow-md" 
                         readOnly={0 < progress && progress < 100}
+                        modules={{
+                            toolbar: toolbarOptions,
+                        }}
                     />
                 </div>
                 <div className="flex items-center justify-between w-full">
                     <Progress progress={progress}/>
                     <button disabled={mutation.isPending || (0 < progress && progress < 100)} className="bg-blue-400 text-white 
                     font-medium rounded-xl mt-4 p-2 w-36 ml-auto transition-all duration-200 hover:-translate-y-1 hover:shadow-lg
-                    disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    disabled:bg-gray-400 disabled:cursor-not-allowed active:scale-95 hover:bg-blue-500">
                         {mutation.isPending ? "Loading..." : "Upload"}
                     </button>
                 </div>

@@ -9,7 +9,7 @@ const NavBar = () => {
     return (
         <div className="w-full h-16 md:h-20 flex items-center justify-between ">
             {/* LOGO */}
-            <Link to="/" className="flex items-center gap-4 text-2xl font-bold outline-none">
+            <Link to="/home" className="flex items-center gap-4 text-2xl font-bold outline-none">
                 <Image src="logo.png" className="w-8 h-8" alt="Blog logo"/>
                 <span>Blog Platform</span>
             </Link>
@@ -31,10 +31,9 @@ const NavBar = () => {
                 <div className={`w-full h-screen flex flex-col items-center justify-center 
                     absolute top-16 bg-amber-100 transition-all ease-in-out gap-8 font-medium text-lg
                     ${openMenu ? ("-right-0") : ("-right-full")}`}>
-                    <Link to="/">Home</Link>
-                    <Link to="/">Trending</Link>
-                    <Link to="/">Popular</Link>
-                    <Link to="/">About</Link>
+                    <Link to="/home" onClick={() => setOpenMenu(false)}>Home</Link>
+                    <Link to="/" onClick={() => setOpenMenu(false)}>Trending</Link>
+                    <Link to="/" onClick={() => setOpenMenu(false)}>Popular</Link>
                     <SignedOut>
                         <Link to="/login">
                             <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>
@@ -48,10 +47,9 @@ const NavBar = () => {
 
             {/* DESKTOP MENU */}
             <div className="hidden md:flex items-center gap-8 xl:gap-12 font-medium">
-                <Link to="/">Home</Link>
+                <Link to="/home">Home</Link>
                 <Link to="/">Trending</Link>
                 <Link to="/">Popular</Link>
-                <Link to="/">About</Link>
                 <SignedOut>
                     <Link to="/login">
                         <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>

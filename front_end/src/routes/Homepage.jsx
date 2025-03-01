@@ -3,12 +3,13 @@ import Image from "../components/Image";
 import MainCategories from "../components/MainCategories";
 import FeaturedPost from "../components/FeaturedPost";
 import PostList from "../components/PostList";
+import SideMenu from "../components/SideMenu";
 
 const Homepage = () => {
     return (
         <div className="mt-4 flex flex-col gap-4">
             <div className="flex gap-4">
-                <Link to='/'>Home</Link>
+                <Link to='/home'>Home</Link>
                 <span>·</span>
                 <span className="text-blue-800">Blogs and Articles</span>
             </div>
@@ -21,7 +22,7 @@ const Homepage = () => {
                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
                     </p>
                 </div>
-                <Link to='write' className="flex flex-col items-center">
+                <Link to='/write' className="flex flex-col items-center">
                     <Image src="write.png" className="w-20 h-20" alt="Blog logo"/>
                     <span>Share your story!</span>
                 </Link>
@@ -34,8 +35,8 @@ const Homepage = () => {
             <FeaturedPost/>
 
             {/* POSTLIST */}
-            <div className="">
-                <h1 className="my-8 text-2xl text-gray-400">Recent posts</h1>
+            <h1 className="my-4 text-2xl text-gray-400">Recent posts</h1>
+            <div className="xl:flex xl:flex-row">
                 <PostList/>
             </div>
         </div>

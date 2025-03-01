@@ -13,6 +13,8 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LandingPage from './routes/LandingPage.jsx';
+import ErrorPage from './routes/ErrorPage.jsx';
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,10 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <LandingPage/>
+      },
+      {
+        path: "/home",
         element: <Homepage/>
       },
       {
@@ -49,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/:slug",
         element: <SinglePostPage/>
+      },
+      {
+        path: "*",
+        element: <ErrorPage/>
       },
     ]
   }

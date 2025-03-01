@@ -8,7 +8,7 @@ const Image = ({src, className, w, h, alt}) => {
                 className = {className}
                 loading = "lazy"
                 width = {w}
-                height = {w}
+                height = {h}
                 alt = {alt}
                 lqip = {{active: true, quality: 20}}
                 transformation={[

@@ -1,24 +1,36 @@
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
+import { sequelize } from "../lib/connectDB.js";
+import { DataTypes } from "sequelize";
 
-const commentSchema = new Schema(
+const Comment = sequelize.define(
+    'comment', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "User",
+                key: "id",
+            },
+        },
+        postId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "Post",
+                key: "id",
+            },
+        },
+        content: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        }
+    },
     {
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        post: {
-            type: Schema.Types.ObjectId,
-            ref: "Post",
-            required: true,
-        },
-        desc: {
-            type: String,
-            unique: true,
-        },
-    }, 
-        {timestamps: true}
-);
+    },
+)
 
-export default mongoose.model("Comment", commentSchema);
+export default Comment;

@@ -1,35 +1,46 @@
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
+import { sequelize } from "../lib/connectDB.js"
+import { DataTypes } from "sequelize"
 
-const userSchema = new Schema(
+const User = sequelize.define(
+    'User',
     {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
         clerkId: {
-            type: String,
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
         },
         clerkUserId: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
         },
         username: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
         },
         email: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
         },
         img: {
-            type: String,
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         savedPosts: {
-            type: [String],
-            default: [],
+            type: DataTypes.JSON,
+            allowNull: false,
+            defaultValue: [],
         },
-    }, 
-        {timestamps: true}
-);
+    },
+    {
+    },
+)
 
-export default mongoose.model("User", userSchema);
+export default User;

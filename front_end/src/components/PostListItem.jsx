@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import Image from "./Image";
+import React from "react";
 
-const PostListItem = () => {
+const PostListItem = (({key, post}) => {
     return (
         <div className="flex flex-col xl:flex-row gap-8">
             {/* IMAGE */}
@@ -30,6 +31,6 @@ const PostListItem = () => {
             </div>
         </div>
     )
-}
+})
 
 export default PostListItem;

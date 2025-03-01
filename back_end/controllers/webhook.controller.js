@@ -21,40 +21,52 @@ export const clerkWebHook = async(req, res) => {
         });
     }
 
-    // create an user and save to MongoDB
+    // create an user
     if (event.type === "user.created") {
-        const newUser = new User({
-            clerkId: event.data.id,
-            clerkUserId: event.data.id,
-            username: event.data.username || event.data.email_addresses[0].email_address,
-            email: event.data.email_addresses[0].email_address,
-            img: event.data.profile_img_url,
-        })
-        await newUser.save();
+        try {
+            await User.create({
+                clerkId: event.data.id,
+                clerkUserId: event.data.id,
+                username: event.data.username || event.data.email_addresses[0].email_address,
+                email: event.data.email_addresses[0].email_address,
+                img: event.data.profile_image_url,
+            });
+            console.log("User Created!");
+        } catch (err) {
+            console.log(err);
+        }
     }
 
-    // update user infomation and save to MongoDB
+    // update user infomation
     if (event.type === "user.updated") {
-        const updatedUser = await User.findOneAndUpdate({
-            clerkId: event.data.id
-        }, {
-            username: event.data.username || event.data.email_addresses[0].email_address,
-            email: event.data.email_addresses[0].email_address,
-            img: event.data.profile_img_url,
-        }, {
-            new: true,
-        })
+        try {
+            await User.update({
+                username: event.data.username || event.data.email_addresses[0].email_address,
+                email: event.data.email_addresses[0].email_address,
+                img: event.data.profile_img_url,
+            }, {
+                where: {
+                    clerkId: event.data.id,
+                }
+            });
+            console.log("User updated!");
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     // delete an user and all post and comment of that user
     if (event.type === "user.deleted") {
-        const deletedUser = await User.findOneAndDelete({
-            clerkId: event.data.id,
-        })
-
-        //TODO: delete all deletedUser's post here
-        
-        //TODO: delete all deletedUser's comment here
+        try {
+            await User.destroy({
+                where: {
+                    clerkId: event.data.id
+                }
+            });
+            console.log("User deleted!");
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return res.status(200).json({

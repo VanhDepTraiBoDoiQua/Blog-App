@@ -1,46 +1,80 @@
-import { Schema } from "mongoose";
-import mongoose from "mongoose";
+import { sequelize } from "../lib/connectDB.js";
+import { DataTypes } from "sequelize";
+import User from "./user.model.js";
+import Comment from "./comment.model.js";
 
-const postSchema = new Schema(
+const Post = sequelize.define(
+    'Post', 
     {
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
         },
-        img: {
-            type: String,
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "User",
+                key: "id",
+            },
+        },
+        image: {
+            type: DataTypes.STRING,
         },
         title: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         category: {
-            type: String,
-            default: "general",
+            type: DataTypes.STRING,
+            defaultValue: "general",
         },
         slug: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
             unique: true,
         },
         description: {
-            type: String,
+            type: DataTypes.STRING,
         },
         content: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         isFeatured: {
-            type: Boolean,
-            default: false,
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
         },
         visit: {
-            type: Number,
-            default: 0,
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
         },
-    }, 
-        {timestamps: true}
+    },
+    {
+    },
 );
 
-export default mongoose.model("Post", postSchema);
+Post.belongsTo(User, {
+    foreignKey: "userId",
+});
+Post.hasMany(Comment, {
+    foreignKey: "postId",
+    onDelete: "CASCADE",
+});
+Comment.belongsTo(User, {
+    foreignKey: "userId",
+});
+Comment.belongsTo(Post, {
+    foreignKey: "postId",
+});
+User.hasMany(Post, {
+    foreignKey: "userId",
+    onDelete: "CASCADE",
+});
+User.hasMany(Comment, {
+    foreignKey: "userId",
+    onDelete: "CASCADE",
+});
+
+export default Post;
