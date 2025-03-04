@@ -9,6 +9,13 @@ export const getPosts = async (req, res) => {
     const posts = await Post.findAll({
         limit: limit,
         offset: (page - 1) * limit,
+        include: {
+            model: User,
+            attributes: ['username'],
+        },
+        order: [
+            ['createdAt', 'DESC']
+        ]
     });
     const totalPosts = await Post.count()
     const hasMore = (page * limit) < totalPosts;
@@ -21,6 +28,13 @@ export const getPost = async (req, res) => {
         const post = await Post.findOne({
             where: {
                 slug: req.params.slug,
+            },
+            include: {
+                model: User,
+                attributes: [
+                    'username', 
+                    'img'
+                ],
             },
         });
         res.status(200).json(post);

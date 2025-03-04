@@ -15,7 +15,7 @@ const PostList = () => {
     const [page, setPage] = useState(currentPage);
 
     useEffect(() => {
-        localStorage.setItem('page', page);
+        sessionStorage.setItem('page', page);
         window.scrollTo(0, 0);
     }, [page]);
 
@@ -28,14 +28,12 @@ const PostList = () => {
 
     if (error) return "An error has occured: " + error.message;
 
-    console.log(data)
-
     return (
         <>
             <div>
                 <div className="flex flex-col gap-12 mb-8">
                     {data.posts.map(post => (
-                        <PostListItem key={post._id} post={post}/>
+                        <PostListItem key={post.id} post={post}/>
                     ))}
                 </div>
                 <div className="bg-white text-blue-400 font-semibold items-center flex justify-between gap-10 my-10 mx-auto rounded-full w-fit px-5 py-3">

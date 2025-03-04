@@ -1,4 +1,4 @@
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { RedirectToSignIn, useAuth, useUser } from "@clerk/clerk-react";
 import 'react-quill-new/dist/quill.snow.css';
 import ReactQuill from "react-quill-new";
 import { useMutation } from "@tanstack/react-query";
@@ -98,7 +98,7 @@ const Write = () => {
 
     if (isLoaded && !isSignedIn) {
         return (
-            <div className="text-2xl text-red-700 flex flex-row items-center justify-center my-20 font-extrabold">You have to login first!</div>
+            <RedirectToSignIn/>
         )
     }
 
