@@ -98,7 +98,7 @@ const Comments = ({postId}) => {
                         />
                     )}
                     {data.map((comment) => (
-                        <SingleComment key={comment.id} comment={comment}/>
+                        <SingleComment key={comment.id} comment={comment} postId={postId}/>
                     ))}
                 </>
             )

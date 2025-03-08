@@ -1,10 +1,12 @@
 import { useState } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 
 const NavBar = () => {
     const [openMenu, setOpenMenu] = useState(false);
+    const {user} = useUser();
+    const role = user?.publicMetadata?.role;
 
     return (
         <div className="w-full h-16 md:h-20 flex items-center justify-between ">
@@ -34,6 +36,7 @@ const NavBar = () => {
                     <Link to="/home" onClick={() => setOpenMenu(false)}>Home</Link>
                     <Link to="/" onClick={() => setOpenMenu(false)}>Trending</Link>
                     <Link to="/" onClick={() => setOpenMenu(false)}>Popular</Link>
+                    {role === "admin" && <Link to="/admin">Admin Page</Link>}
                     <SignedOut>
                         <Link to="/login">
                             <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>
@@ -50,6 +53,7 @@ const NavBar = () => {
                 <Link to="/home">Home</Link>
                 <Link to="/">Trending</Link>
                 <Link to="/">Popular</Link>
+                {role === "admin" && <Link to="/admin">Admin Page</Link>}
                 <SignedOut>
                     <Link to="/login">
                         <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>

@@ -1,40 +1,46 @@
 import Comment from "../models/comment.model.js";
 import User from "../models/user.model.js";
 
+// get all comment of a post
 export const getComments = async (req, res) => {
-    const comments = await Comment.findAll({
-        where: {
-            postId: req.params.postId,
-        },
-        include: {
-            model: User,
-            attributes: [
-                "username", 
-                "img",
+    try {
+        const comments = await Comment.findAll({
+            where: {
+                postId: req.params.postId,
+            },
+            include: {
+                model: User,
+                attributes: [
+                    "username", 
+                    "img",
+                ],
+            },
+            order: [
+                ['createdAt', 'DESC']
             ],
-        },
-        order: [
-            ['createdAt', 'DESC']
-        ],
-    });
-    res.json(comments);
+        });
+        res.json(comments);
+    } catch(err) {
+        console.log(err);
+    }
 }
 
+// post a comment
 export const postComments = async (req, res) => {
-    const clerkUserId = req.auth.userId;
+    const clerkId = req.auth.userId;
     const postId = req.params.postId;
 
-    if (!clerkUserId) {
+    if (!clerkId) {
         return res.status(401).json("Not authenticated!");
     }
-
-    const user = await User.findOne({
-        where: {
-            clerkUserId: clerkUserId,
-        }
-    })
-
+    
     try {
+        const user = await User.findOne({
+            where: {
+                clerkId: clerkId,
+            }
+        });
+
         const newComment = await Comment.create({
         userId: user.id,
         postId: postId,
@@ -47,29 +53,50 @@ export const postComments = async (req, res) => {
     }
 }
 
+// delete a comment
 export const deleteComments = async (req, res) => {
-    const clerkUserId = req.auth.userId;
+    const clerkId = req.auth.userId;
     const id = req.params.id;
 
-    if (!clerkUserId) {
+    if (!clerkId) {
         return res.status(401).json("Not authenticated!");
     }
 
-    const user = await User.findOne({
-        where: {
-            clerkUserId: clerkUserId,
-        },
-    });
+    const role = req.auth.sessionClaims?.metadata?.role || "user";
+    if (role === "admin") {
+        try {
+            const deletedComment = await Comment.destroy({
+                where: {
+                    id: id,
+                }
+            });
+    
+            if (deletedComment === 0) {
+                return res.status(403).json("You can't delete this comment!");
+            }
+    
+            console.log("Comment deleted");
+            return res.status(200).json(deletedComment);
+        } catch(err) {
+            console.log(err);
+        }
+    }
 
     try {
+        const user = await User.findOne({
+            where: {
+                clerkId: clerkId,
+            },
+        });
+
         const deletedComment = await Comment.destroy({
             where: {
                 id: id,
                 userId: user.id,
             }
-        })
+        });
 
-        if (!deletedComment) {
+        if (deletedComment === 0) {
             return res.status(403).json("You can't delete this comment!");
         }
 

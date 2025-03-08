@@ -1,5 +1,7 @@
 import { Webhook } from "svix";
 import User from "../models/user.model.js";
+import Comment from "../models/comment.model.js";
+import Post from "../models/post.model.js";
 
 export const clerkWebHook = async(req, res) => {
     const clerkWebHookSecrect = process.env.CLERK_WEBHOOK_SECRECT;
@@ -58,10 +60,28 @@ export const clerkWebHook = async(req, res) => {
     // delete an user and all post and comment of that user
     if (event.type === "user.deleted") {
         try {
-            await User.destroy({
+            const deletedUser = User.findOne({
                 where: {
                     clerkId: event.data.id
-                }
+                },
+            });
+
+            await Comment.destroy({
+                where: {
+                    userId: deletedUser.id,
+                },
+            });
+
+            await Post.destroy({
+                where: {
+                    userId: deletedUser.id,
+                },
+            });
+
+            await User.destroy({
+                where: {
+                    id: deletedUser.id,
+                },
             });
             console.log("User deleted!");
         } catch (err) {

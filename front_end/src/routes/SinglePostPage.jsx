@@ -4,7 +4,7 @@ import PostMenuActions from "../components/PostMenuActions";
 import Search from "../components/Search";
 import Comments from "../components/Comments";
 import { useEffect } from "react";
-import {useQuery} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import ErrorPage from "../routes/ErrorPage";
 import { format } from "timeago.js";
@@ -13,6 +13,7 @@ import parse from "html-react-parser";
 
 const fetchPost = async (slug) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+    console.log(res.data);
     return res.data;
 }
 
@@ -85,7 +86,7 @@ const SinglePostPage = () => {
                             </Link>
                         </div>
                     </div>
-                    <PostMenuActions/>
+                    <PostMenuActions post={data}/>
                     <h1 className="mt-8 mg-4 text-sm font-medium">Categories</h1>
                     <div className="flex flex-col gap-2 text-sm">
                         <Link className="underline">All</Link>

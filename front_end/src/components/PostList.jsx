@@ -32,7 +32,7 @@ const PostList = () => {
         <>
             <div>
                 <div className="flex flex-col gap-12 mb-8">
-                    {data.posts.map(post => (
+                    {data?.posts?.map(post => (
                         <PostListItem key={post.id} post={post}/>
                     ))}
                 </div>

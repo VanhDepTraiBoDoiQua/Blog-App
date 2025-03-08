@@ -15,6 +15,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import LandingPage from './routes/LandingPage.jsx';
 import ErrorPage from './routes/ErrorPage.jsx';
+import AdminPage from './routes/AdminPage.jsx';
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/posts",
         element: <PostListPage/>
+      },
+      {
+        path: "/admin",
+        element: <AdminPage/>
       },
       {
         path: "/write",

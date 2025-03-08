@@ -51,7 +51,7 @@ const Write = () => {
             navigate(`/${res.data.slug}`);
         },
 
-        onError: (res) => {
+        onError: () => {
             toast.error("An error has occured!");
         }
     })
@@ -97,9 +97,7 @@ const Write = () => {
     }
 
     if (isLoaded && !isSignedIn) {
-        return (
-            <RedirectToSignIn/>
-        )
+        return navigate("/login");
     }
 
     return (

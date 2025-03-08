@@ -1,5 +1,5 @@
 import express from "express";
-import { getPosts, getPost, createPost, deletePost, uploadAuth } from "../controllers/post.controller.js";
+import { getPosts, getPost, createPost, deletePost, uploadAuth, featurePost } from "../controllers/post.controller.js";
 
 const router = express.Router();
 
@@ -17,6 +17,8 @@ router.post("/", createPost);
 
 // delete a single post
 router.delete("/:id", deletePost);
+
+router.patch("/feature", featurePost);
 
 
 export default router;
