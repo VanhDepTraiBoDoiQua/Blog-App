@@ -39,7 +39,7 @@ const Post = sequelize.define(
             type: DataTypes.STRING,
         },
         content: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         isFeatured: {

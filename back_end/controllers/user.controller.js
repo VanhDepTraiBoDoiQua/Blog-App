@@ -61,12 +61,20 @@ export const savePost = async (req, res) => {
     }
 }
 
+// get all users for admin
 export const getAllUsers = async(req, res) => {
-    const role = req.auth.sessionClaims?.metadata?.role || "user";
+    const role = req?.auth?.sessionClaims?.metadata?.role || "user";
     if (role === "admin") {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
         try {
-            const users = await clerkClient.users.getUserList();
-            res.status(200).json(users);
+            const users = await clerkClient.users.getUserList({
+                limit: limit,
+                offset: (page-1) * limit,
+            });
+            const totalUser = await clerkClient.users.getCount();
+            const hasMore = (page*limit) < totalUser;
+            res.status(200).json({users, hasMore});
         } catch(err) {
             console.log(err);
         }
@@ -75,14 +83,28 @@ export const getAllUsers = async(req, res) => {
     }
 }
 
+// admin create an user
 export const createUser = async(req, res) => {
     const role = req.auth.sessionClaims?.metadata?.role || "user";
     if (role === "admin") {
         try {
             const userData = req.body.data;
-            const user = await clerkClient.users.createUser(userData);
-            console.log("User created!");
-            res.status(200);
+            const findByEmail = await clerkClient.users.getCount({
+                emailAddress: userData.email_address,
+            });
+            if (findByEmail > 0) {
+                return res.status(400).json("Email already exists");
+            }
+
+            const findByUsername = await clerkClient.users.getCount({
+                username: userData.username,
+            });
+            if (findByUsername > 0) {
+                return res.status(400).json("Username already exists");
+            }
+
+            const newUser = await clerkClient.users.createUser(userData);
+            return res.status(200).json(newUser);
         } catch(err) {
             console.log(err);
         }

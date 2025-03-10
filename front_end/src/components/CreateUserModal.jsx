@@ -1,10 +1,11 @@
 import { useAuth } from "@clerk/clerk-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const CreateUserModal = ({onClose}) => {
     const {getToken} = useAuth();
+    const queryClient = useQueryClient();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -39,11 +40,12 @@ const CreateUserModal = ({onClose}) => {
 
         onSuccess: () => {
             toast.success("New user has been created!");
+            queryClient.invalidateQueries({queryKey: ["users"]});
             onClose();
         },
 
-        onError: () => {
-            toast.error("An error has occured!");
+        onError: (res) => {
+            toast.error(res?.response?.data);
         }
     });
 
@@ -100,7 +102,7 @@ const CreateUserModal = ({onClose}) => {
             
                     {/* Buttons */}
                     <div className="flex justify-between items-center mt-4">
-                        <button className="bg-purple-400 text-white py-2 px-4 rounded-lg hover:bg-purple-300 ml-auto">
+                        <button disabled={createMutation.isPending} className="bg-purple-400 text-white py-2 px-4 rounded-lg hover:bg-purple-300 ml-auto disabled:bg-gray-400 disabled:cursor-not-allowed">
                             Create user
                         </button>
                     </div>

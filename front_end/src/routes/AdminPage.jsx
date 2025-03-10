@@ -10,8 +10,8 @@ const AdminPage = () => {
 
     if (user?.publicMetadata?.role === "admin") {
         return (
-            <div className="flex flex-row h-screen">
-                <div className="bg-purple-200 flex flex-col w-1/6 text-center items-center h-full absolute left-0 top-20">
+            <div className="flex flex-row h-screen border-y border-black">
+                <div className="bg-purple-200 flex flex-col w-1/6 text-center items-center h-full absolute left-0 top-20 border-r border-y border-black">
                     <span onClick={() => setSelected("users")} className="w-full py-5 cursor-pointer hover:bg-purple-300">Users</span>
                     <span onClick={() => setSelected("posts")} className="w-full py-5 cursor-pointer hover:bg-purple-300">Post</span>
                 </div>

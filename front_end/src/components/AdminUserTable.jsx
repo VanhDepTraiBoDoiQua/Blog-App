@@ -8,12 +8,14 @@ import CreateUserModal from "./CreateUserModal";
 const AdminUserTable = () => {
     const {getToken} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
+    const [page, setPage] = useState(1);
 
     const {isPending, error, data} = useQuery({
-        queryKey: ["users"],
+        queryKey: ["users", page],
         queryFn: async () => {
             const token = await getToken();
             return axios.get(`${import.meta.env.VITE_API_URL}/users`, {
+                params: {page},
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -22,8 +24,6 @@ const AdminUserTable = () => {
     });
 
     if (isPending) return "Loading...";
-
-    console.log(data);
 
     return (
         <>
@@ -45,17 +45,34 @@ const AdminUserTable = () => {
                             <th className="border-b border-gray-300 px-4 py-2">User</th>
                             <th className="border-b border-gray-300 px-4 py-2">Username</th>
                             <th className="border-b border-gray-300 px-4 py-2">Role</th>
-                            <th className="border-b border-gray-300 px-4 py-2">Last Active at</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Updated at</th>
                             <th className="border-b border-gray-300 px-4 py-2">Created at</th>
                             <th className="border-b border-gray-300 px-4 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data.data.data.map((user) => (
+                        {data?.data?.users?.data?.map((user) => (
                             <AdminUserItem key={user.id} user={user}/>
                         ))}
                     </tbody>
                 </table>
+            </div>
+            <div className="flex ml-auto items-center gap-4 mt-5">
+                <button
+                    className="disabled:text-gray-400 px-1 py-1"
+                    onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                    disabled={page === 1}
+                >
+                    Prev
+                </button>
+                <span className="">Page {page}</span>
+                <button
+                    className="disabled:text-gray-400 px-1 py-1"
+                    onClick={() => setPage(prev => prev + 1)}
+                    disabled={!data?.data?.hasMore}
+                >
+                    Next
+                </button>
             </div>
         </>
     )

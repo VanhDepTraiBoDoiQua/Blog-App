@@ -60,7 +60,7 @@ export const clerkWebHook = async(req, res) => {
     // delete an user and all post and comment of that user
     if (event.type === "user.deleted") {
         try {
-            const deletedUser = User.findOne({
+            const deletedUser = await User.findOne({
                 where: {
                     clerkId: event.data.id
                 },

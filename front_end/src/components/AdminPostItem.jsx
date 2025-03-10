@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const AdminPostItem = ({post}) => {
     const createdAt = new Date(post.createdAt).toLocaleDateString("en-US", { 
         year: "numeric", 
@@ -8,7 +10,11 @@ const AdminPostItem = ({post}) => {
 
     return (
         <tr className="text-center text-gray-700 hover:bg-[hwb(48_86%_2%)]">
-            <td className="border-b border-gray-300 px-4 py-2 font-semibold">{post.title}</td>
+            <td className="border-b border-gray-300 px-4 py-2 font-semibold">
+                <Link to={`/${post.slug}`}>
+                    {post.title}
+                </Link>
+            </td>
             <td className="border-b border-gray-300 px-4 py-2">{post.category}</td>
             <td className="border-b border-gray-300 px-4 py-2">{post.User.username}</td>
             <td className="border-b border-gray-300 px-4 py-2">{createdAt}</td>

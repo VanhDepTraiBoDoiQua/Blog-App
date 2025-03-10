@@ -1,5 +1,5 @@
 const AdminUserItem = ({user}) => {
-    const lastActiveAt = new Date(user.lastActiveAt).toLocaleDateString("en-US", { 
+    const updatedAt = new Date(user.updatedAt).toLocaleDateString("en-US", { 
         year: "numeric", 
         month: "long", 
         day: "numeric", 
@@ -28,7 +28,7 @@ const AdminUserItem = ({user}) => {
             </td>
             <td className="border-b border-gray-300 px-4 py-2">{user.username}</td>
             <td className="border-b border-gray-300 px-4 py-2">{user.publicMetadata?.role || "user"}</td>
-            <td className="border-b border-gray-300 px-4 py-2">{lastActiveAt}</td>
+            <td className="border-b border-gray-300 px-4 py-2">{updatedAt}</td>
             <td className="border-b border-gray-300 px-4 py-2">{createdAt}</td>
             <td className="border-b border-gray-300 px-4 py-2">
                 <div className="flex items-center justify-center gap-4">

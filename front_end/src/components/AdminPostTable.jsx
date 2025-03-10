@@ -4,14 +4,13 @@ import AdminPostItem from "./AdminPostItem";
 import { useState } from "react";
 
 const AdminPostTable = () => {
-    const limit = 10;
     const [page, setPage] = useState(1);
 
     const {isPending, error, data} = useQuery({
         queryKey: ["posts", page],
         queryFn: () => {
             return axios.get(`${import.meta.env.VITE_API_URL}/posts`, {
-                params: {page, limit},
+                params: {page},
             });
         },
     });
@@ -31,7 +30,7 @@ const AdminPostTable = () => {
                 <table className="table-auto border-separate border-spacing-0 w-full">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="border-b border-gray-300 px-4 py-2">Title</th>
+                            <th className="border-b border-gray-300 px-4 py-2 w-1/3">Title</th>
                             <th className="border-b border-gray-300 px-4 py-2">Category</th>
                             <th className="border-b border-gray-300 px-4 py-2">Author</th>
                             <th className="border-b border-gray-300 px-4 py-2">Created at</th>

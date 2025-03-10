@@ -10,6 +10,7 @@ import ErrorPage from "../routes/ErrorPage";
 import { format } from "timeago.js";
 import DOMPurify from "dompurify";
 import parse from "html-react-parser";
+import { useUser } from "@clerk/clerk-react";
 
 const fetchPost = async (slug) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
@@ -18,6 +19,7 @@ const fetchPost = async (slug) => {
 }
 
 const SinglePostPage = () => {
+    const {isLoaded, isSignedIn} = useUser();
     const path = useLocation();
     useEffect(() => {
         window.scrollTo({top: 0});
@@ -86,7 +88,7 @@ const SinglePostPage = () => {
                             </Link>
                         </div>
                     </div>
-                    <PostMenuActions post={data}/>
+                    {isSignedIn && <PostMenuActions post={data}/>}
                     <h1 className="mt-8 mg-4 text-sm font-medium">Categories</h1>
                     <div className="flex flex-col gap-2 text-sm">
                         <Link className="underline">All</Link>
