@@ -3,9 +3,9 @@ import Image from "../components/Image";
 import MainCategories from "../components/MainCategories";
 import FeaturedPost from "../components/FeaturedPost";
 import PostList from "../components/PostList";
-import SideMenu from "../components/SideMenu";
 
 const Homepage = () => {
+
     return (
         <div className="mt-4 flex flex-col gap-4">
             <div className="flex gap-4">

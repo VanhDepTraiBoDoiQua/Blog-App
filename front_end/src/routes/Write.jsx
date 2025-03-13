@@ -1,4 +1,3 @@
-import { RedirectToSignIn, useAuth, useUser } from "@clerk/clerk-react";
 import 'react-quill-new/dist/quill.snow.css';
 import ReactQuill from "react-quill-new";
 import { useMutation } from "@tanstack/react-query";
@@ -9,15 +8,15 @@ import { toast } from "react-toastify";
 import Upload from "../components/Upload";
 import Progress from "../components/Progress";
 import Image from "../components/Image";
+import { isAuth } from "../auth/auth.js";
 
 const Write = () => {
-    const {isLoaded, isSignedIn} = useUser();
+    const isSignedIn = isAuth();
     const [value, setValue] = useState("");
     const [cover, setCover] = useState("");
     const [image, setImage] = useState("");
     const [video, setVideo] = useState("");
     const [progress, setProgress] = useState(0);
-    const {getToken} = useAuth();
     const navigate = useNavigate();
     const toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -37,13 +36,10 @@ const Write = () => {
     ]
 
     const mutation = useMutation({
-        mutationFn: async (newPost) => {
-            const token = await getToken();
-            return axios.post(`${import.meta.env.VITE_API_URL}/posts`, newPost, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        mutationFn: (newPost) => {
+            return axios.post(`${import.meta.env.VITE_API_URL}/posts`, 
+                newPost, 
+            {withCredentials: true});
         },
 
         onSuccess: (res) => {
@@ -90,17 +86,11 @@ const Write = () => {
         cover && setCover(cover);
     }, [cover])
 
-    if (!isLoaded) {
-        return (
-            <div className="">Loading...</div>
-        )
-    }
-
     useEffect(() => {
-        if (isLoaded && !isSignedIn) {
+        if (!isSignedIn) {
             navigate("/login");
         }
-    }, [isLoaded, isSignedIn, navigate]);
+    }, [isSignedIn, navigate]);
 
     return (
         <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">

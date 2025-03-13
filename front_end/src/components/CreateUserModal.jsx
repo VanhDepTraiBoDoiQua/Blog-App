@@ -1,10 +1,8 @@
-import { useAuth } from "@clerk/clerk-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const CreateUserModal = ({onClose}) => {
-    const {getToken} = useAuth();
     const queryClient = useQueryClient();
 
     const handleSubmit = (e) => {
@@ -14,11 +12,12 @@ const CreateUserModal = ({onClose}) => {
         const data = {
             firstName: formData.get("firstName"),
             lastName: formData.get("lastName"),
-            email_address: [formData.get("email")],
+            email: formData.get("email"),
             password: formData.get("password"),
             username: formData.get("username")
         };
-        if (data.email_address && data.password && data.username) {
+        if (data.email && data.password && data.username) {
+            console.log(data);
             createMutation.mutate(data);
         } else {
             toast.error("Email, Username, Password cannot be blank!");
@@ -27,15 +26,10 @@ const CreateUserModal = ({onClose}) => {
 
     const createMutation = useMutation({
         mutationKey: ["users"],
-        mutationFn: async(data) => {
-            const token = await getToken();
-            return axios.post(`${import.meta.env.VITE_API_URL}/users`, {
+        mutationFn: async (data) => {
+            return await axios.post(`${import.meta.env.VITE_API_URL}/admin`, {
                 data: data,
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            }, {withCredentials: true});
         },
 
         onSuccess: () => {
@@ -78,6 +72,12 @@ const CreateUserModal = ({onClose}) => {
                         </div>
                     </div>
             
+                    {/* Username */}
+                    <div>
+                        <label className="block text-sm font-medium">Username</label>
+                        <input name="username" type="text" className="w-full p-2 border rounded-lg" />
+                    </div>
+
                     {/* Email */}
                     <div>
                         <label className="block text-sm font-medium">Email</label>
@@ -86,12 +86,6 @@ const CreateUserModal = ({onClose}) => {
                             type="email"
                             className="w-full p-2 border rounded-lg"
                         />
-                    </div>
-            
-                    {/* Username */}
-                    <div>
-                        <label className="block text-sm font-medium">Username</label>
-                        <input name="username" type="text" className="w-full p-2 border rounded-lg" />
                     </div>
             
                     {/* Password */}

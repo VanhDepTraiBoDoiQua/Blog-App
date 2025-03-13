@@ -1,9 +1,9 @@
 import SingleComment from "./SingleComment";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
 import { useRef } from "react";
+import { getUser, isAuth } from "../auth/auth.js";
 
 const fetchComments = async (postId) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/comments/${postId}`);
@@ -11,20 +11,15 @@ const fetchComments = async (postId) => {
 }
 
 const Comments = ({postId}) => {
-    const {getToken} = useAuth();
-    const {user, isSignedIn} = useUser();
+    const isSignedIn = isAuth();
+    const user = getUser();
     const textAreaRef = useRef();
 
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
         mutationFn: async (newComment) => {
-            const token = await getToken();
-            return axios.post(`${import.meta.env.VITE_API_URL}/comments/${postId}`, newComment, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            return axios.post(`${import.meta.env.VITE_API_URL}/comments/${postId}`, newComment, {withCredentials: true});
         },
 
         onSuccess: () => {
@@ -72,7 +67,7 @@ const Comments = ({postId}) => {
                     className="outline-none w-full p-4 rounded-full"
                     placeholder="Write your thought..."
                 />
-                <button disabled={mutation.isPending} className="bg-emerald-100 px-4 py-3 font-medium rounded-xl">{
+                <button type="submit" disabled={mutation.isPending} className="bg-emerald-100 px-4 py-3 font-medium rounded-xl">{
                         mutation.isPending ? (
                             "Sending..."
                         ) : (
@@ -91,7 +86,7 @@ const Comments = ({postId}) => {
                                 content: `${mutation.variables.content}(Sending...)`,
                                 createdAt: new Date(),
                                 User: {
-                                    img: user.imageUrl,
+                                    img: user.img,
                                     username: user.username,
                                 },
                         }}

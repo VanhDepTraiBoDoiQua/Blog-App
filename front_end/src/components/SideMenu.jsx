@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const SideMenu = () => {
     return (
-        <div className="px-4 h-max sticky top-8">
+        <div className="px-4 h-max top-8">
             <h1 className="mb-4 text-sm font-medium">Search</h1>
             <Search/>
             <h1 className="mb-4 text-sm font-medium mt-8">Filter</h1>

@@ -1,8 +1,6 @@
-import { Sequelize } from "sequelize";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import ImageKit from "imagekit";
-import { sequelize } from "../lib/connectDB.js";
 import Comment from "../models/comment.model.js";
 
 // get all post
@@ -53,11 +51,7 @@ export const getPost = async (req, res) => {
 
 // create a single post
 export const createPost = async (req, res) => {
-    const clerkId = req.auth.userId;
-
-    if (!clerkId) {
-        return res.status(401).json("Not authenticated!");
-    }
+    const user = req.user;
 
     // generate slug for a new post
     let slug = req.body.title
@@ -85,102 +79,68 @@ export const createPost = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({
-            where: {
-                clerkId: clerkId,
-            },
-        });
-
         const post = await Post.create({
             userId: user.id,
             slug: slug,
             ...req.body,
         });
-        res.status(200).json(post);
+
         console.log("Post created!");
+        return res.status(200).json(post);
     } catch (err) {
         console.log(err);
+        return res.status(400).json("An error has occured");
     }
 }
 
 // delete a single post
 export const deletePost = async (req, res) => {
-    const clerkId = req.auth.userId;
-    
-    if (!clerkId) {
-        return res.status(401).json("Not autheticated!");
+    const user = req.user;
+
+    const post = await Post.findOne({
+        where: {
+            postId: req.params.id,
+        }
+    });
+
+    if (!post) {
+        return res.status(404).json("Post not found");
     }
-    
-    const role = req.auth.sessionClaims?.metadata?.role || "user";
-    if (role === "admin") {
+
+    if (post.userId === user.id || user.role === "admin") {
         try {
-            // TO DO: delete all post's comment
             await Comment.destroy({
                 where: {
-                    postId: req.params.id,
-                },
+                    postId: post.id,
+                }
             });
-    
-            const deletedPost = await Post.destroy({
+
+            await Post.destroy({
                 where: {
-                    id: req.params.id,
-                },
+                    postId: req.params.id,
+                }
             });
-    
+
             console.log("Post deleted!");
-    
-            if (deletedPost === 0) {
-                return res.status(403).json("You don't have permission to delete this post!");
-            }
+            return res.status(200).json("Post deleted!");
         } catch(err) {
             console.log(err);
+            return res.status(400).json("An error has occured");
         }
-        return res.status(200).json("Deleted!");
     }
-
-    try {
-        const user = await User.findOne({
-            where: {
-                clerkId: clerkId,
-            },
-        });
-
-        // TO DO: delete all post's comment
-        await Comment.destroy({
-            where: {
-                postId: req.params.id,
-            },
-        });
-
-        const deletedPost = await Post.destroy({
-            where: {
-                id: req.params.id,
-                userId: user.id,
-            },
-        });
-
-        console.log("Post deleted!");
-
-        if (deletedPost === 0) {
-            return res.status(403).json("You don't have permission to delete this post!");
-        }
-    } catch(err) {
-        console.log(err);
-    }
-    res.status(200).json("Deleted!");
+    return res.status(403).json("You don't have permission to delete this post!");
 }
 
 export const featurePost = async(req, res) => {
-    const role = req.auth.sessionClaims?.metadata?.role || "user";
-    const postId = req.body.postId;
+    const user = req.user;
 
-    if (role !== "admin") {
+    if (user.role !== "admin") {
         return res.status(403).json("Not authorized!");
     }
     try {
         const post = await Post.findOne({
             where: {
-                id: postId,
+                id: req.body.postId,
             },
         });
     

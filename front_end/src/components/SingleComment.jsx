@@ -1,24 +1,18 @@
-import { useAuth, useUser } from "@clerk/clerk-react";
 import { format } from "timeago.js";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getUser } from "../auth/auth.js";
 
 const SingleComment = ({comment, postId}) => {
-    const {user} = useUser();
-    const {getToken} = useAuth();
-    const role = user?.publicMetadata?.role;
+    const user = getUser();
+    const role = user?.role;
 
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: async () => {
-            const token = await getToken();
-            return axios.delete(`${import.meta.env.VITE_API_URL}/comments/${comment.id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+        mutationFn: () => {
+            return axios.delete(`${import.meta.env.VITE_API_URL}/comments/${comment.id}`, {withCredentials:true});
         },
 
         onSuccess: () => {

@@ -1,24 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import AdminUserItem from "./AdminUserItem";
-import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import { useState } from "react";
 import CreateUserModal from "./CreateUserModal";
 
 const AdminUserTable = () => {
-    const {getToken} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [page, setPage] = useState(1);
 
     const {isPending, error, data} = useQuery({
         queryKey: ["users", page],
-        queryFn: async () => {
-            const token = await getToken();
-            return axios.get(`${import.meta.env.VITE_API_URL}/users`, {
+        queryFn: () => {
+            return axios.get(`${import.meta.env.VITE_API_URL}/admin`, {
                 params: {page},
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                withCredentials: true
             });
         },
     });
@@ -51,7 +46,7 @@ const AdminUserTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.data?.users?.data?.map((user) => (
+                        {data?.data?.users?.map((user) => (
                             <AdminUserItem key={user.id} user={user}/>
                         ))}
                     </tbody>

@@ -1,42 +1,17 @@
 import User from "../models/user.model.js";
-import { createClerkClient } from "@clerk/backend";
-
-const clerkClient = createClerkClient({secretKey: process.env.CLERK_SECRET_KEY});
+import bcrypt from "bcrypt";
 
 //get all saved posts
 export const getUserSavedPosts = async (req, res) => {
-    const clerkId = req.auth.userId;
-
-    if (!clerkId) {
-        return res.status(401).json("Not authenticated!");
-    }
-
-    try {
-        const user = await User.findOne({
-            where: {
-                clerkId: clerkId,
-            },
-        });
-        res.status(200).json(user.savedPosts);
-    } catch(err) {
-        console.log(err);
-    }
+    const user = req.user;
+    return res.status(200).json(user.savedPosts);
 }
 
 // save or unsave a post
 export const savePost = async (req, res) => {
-    const clerkId = req.auth.userId;
     const postId = req.body.postId;
 
-    if (!clerkId) {
-        return res.status(401).json("Not authenticated!");
-    }
-
-    const user = await User.findOne({
-        where: {
-            clerkId: clerkId,
-        },
-    })
+    const user = req.user;
 
     const isSaved = user.savedPosts.some((p) => p === postId);
 
@@ -45,9 +20,10 @@ export const savePost = async (req, res) => {
             user.savedPosts.push(postId);
             user.changed("savedPosts", true);
             await user.save();
-            res.status(200).json(isSaved ? "Post unsaved" : "Post saved");
+            return res.status(200).json(isSaved ? "Post unsaved" : "Post saved");
         } catch(err) {
             console.log(err);
+            return res.status(400).json("An error has occured");
         }
     } else {
         try {
@@ -57,58 +33,46 @@ export const savePost = async (req, res) => {
             res.status(200).json(isSaved ? "Post unsaved" : "Post saved");
         } catch(err) {
             console.log(err);
+            return res.status(400).json("An error has occured");
         }
     }
 }
 
-// get all users for admin
-export const getAllUsers = async(req, res) => {
-    const role = req?.auth?.sessionClaims?.metadata?.role || "user";
-    if (role === "admin") {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 5;
-        try {
-            const users = await clerkClient.users.getUserList({
-                limit: limit,
-                offset: (page-1) * limit,
-            });
-            const totalUser = await clerkClient.users.getCount();
-            const hasMore = (page*limit) < totalUser;
-            res.status(200).json({users, hasMore});
-        } catch(err) {
-            console.log(err);
-        }
-    } else {
-        return res.status(403).json("Forbidden!");
-    }
-}
-
-// admin create an user
-export const createUser = async(req, res) => {
-    const role = req.auth.sessionClaims?.metadata?.role || "user";
-    if (role === "admin") {
-        try {
-            const userData = req.body.data;
-            const findByEmail = await clerkClient.users.getCount({
-                emailAddress: userData.email_address,
-            });
-            if (findByEmail > 0) {
-                return res.status(400).json("Email already exists");
-            }
-
-            const findByUsername = await clerkClient.users.getCount({
+export const updateUser = async (req, res) => {
+    const user = req.user;
+    const userData = req.body;
+    
+    if (userData.username) {
+        const findByUsername = await User.count({
+            where: {
                 username: userData.username,
-            });
-            if (findByUsername > 0) {
-                return res.status(400).json("Username already exists");
-            }
+            },
+        });
+        if (findByUsername > 0) {
+            return res.status(400).json("Username already exists");
+        }
+    }
 
-            const newUser = await clerkClient.users.createUser(userData);
-            return res.status(200).json(newUser);
+    if (userData.curPass && userData.newPass) {
+        const isValid = bcrypt.compareSync(userData.curPass, user.password);
+        if (!isValid) {
+            return res.status(400).json("Wrong password");
+        }
+    }
+
+    if(user) {
+        try {
+            Object.assign(user, userData);
+            if (userData.newPass) {
+                user.password = bcrypt.hashSync(userData.newPass, 10);
+            }
+            await user.save();
+            return res.status(200).json("User information has been updated");
         } catch(err) {
             console.log(err);
+            return res.status(400).json("An error has occured");
         }
     } else {
-        return res.status(403).json("Forbidden!");
+        return res.status(400).json("An error has occured");
     }
 }

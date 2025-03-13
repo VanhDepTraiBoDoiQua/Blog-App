@@ -1,5 +1,6 @@
 import express from "express";
 import { getPosts, getPost, createPost, deletePost, uploadAuth, featurePost } from "../controllers/post.controller.js";
+import isAuth from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -13,12 +14,13 @@ router.get("/", getPosts);
 router.get("/:slug", getPost);
 
 // create a single post
-router.post("/", createPost);
+router.post("/", isAuth, createPost);
 
 // delete a single post
-router.delete("/:id", deletePost);
+router.delete("/:id", isAuth, deletePost);
 
-router.patch("/feature", featurePost);
+// feature a post
+router.patch("/feature", isAuth, featurePost);
 
 
 export default router;

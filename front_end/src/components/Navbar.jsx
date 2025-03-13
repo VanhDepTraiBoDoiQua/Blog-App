@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/clerk-react";
+import { getUser, isAuth } from "../auth/auth.js";
+import AvatarDropdown from "./AvatarDropdown.jsx";
 
 const NavBar = () => {
     const [openMenu, setOpenMenu] = useState(false);
-    const {user} = useUser();
-    const role = user?.publicMetadata?.role;
+    const isSignedIn = isAuth();
 
+    const cookies = document.cookie.split("; ");
+    if (cookies) {
+		cookies.forEach(cookie => {
+			if (cookie.startsWith('user_info=')) {
+				const token = cookie.split('=')[1];
+                const user_info = JSON.parse(decodeURIComponent(token));
+                localStorage.setItem("user", JSON.stringify(user_info));
+                localStorage.setItem("exp", Date.now() + 172800000);
+                document.cookie = "user_info=; max-age=0; path=/;";
+			}
+		});
+	}
+
+    const user = getUser();
+    const role = user?.role;
+
+    useEffect(() => {
+    }, [isSignedIn]);
+    
     return (
         <div className="w-full h-16 md:h-20 flex items-center justify-between ">
             {/* LOGO */}
@@ -37,14 +56,14 @@ const NavBar = () => {
                     <Link to="/" onClick={() => setOpenMenu(false)}>Trending</Link>
                     <Link to="/" onClick={() => setOpenMenu(false)}>Popular</Link>
                     {role === "admin" && <Link to="/admin">Admin Page</Link>}
-                    <SignedOut>
+
+                    {isSignedIn ? (
+                        <AvatarDropdown/>
+                    ) : (
                         <Link to="/login">
                             <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>
                         </Link>
-                    </SignedOut>
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
+                    )}
                 </div>
             </div>
 
@@ -54,14 +73,14 @@ const NavBar = () => {
                 <Link to="/">Trending</Link>
                 <Link to="/">Popular</Link>
                 {role === "admin" && <Link to="/admin">Admin Page</Link>}
-                <SignedOut>
+                
+                {isSignedIn ? (
+                    <AvatarDropdown/>
+                ) : (
                     <Link to="/login">
-                        <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>
+                            <button className="py-2 px-4 rounded-3xl bg-lime-400">Login </button>
                     </Link>
-                </SignedOut>
-                <SignedIn>
-                    <UserButton/>
-                </SignedIn>
+                )}
             </div>
         </div>
     )

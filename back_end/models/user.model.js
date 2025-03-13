@@ -9,29 +9,37 @@ const User = sequelize.define(
             primaryKey: true,
             autoIncrement: true,
         },
-        clerkId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-        },
-        clerkUserId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-        },
         username: {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        firstName: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        lastName: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
         },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: "user",
+        },
         img: {
             type: DataTypes.STRING,
             allowNull: true,
+            defaultValue: "https://www.gravatar.com/avatar?d=mp",
         },
         savedPosts: {
             type: DataTypes.JSON,

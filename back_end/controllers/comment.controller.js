@@ -27,82 +27,52 @@ export const getComments = async (req, res) => {
 
 // post a comment
 export const postComments = async (req, res) => {
-    const clerkId = req.auth.userId;
+    const user = req.user;
     const postId = req.params.postId;
-
-    if (!clerkId) {
-        return res.status(401).json("Not authenticated!");
-    }
     
     try {
-        const user = await User.findOne({
-            where: {
-                clerkId: clerkId,
-            }
-        });
-
         const newComment = await Comment.create({
         userId: user.id,
         postId: postId,
         ...req.body,
         });
-        res.status(201).json(newComment);
         console.log("Comment created");
+        return res.status(200).json(newComment);
     } catch(err) {
         console.log(err);
+        return res.status(400).json("An error has occured");
     }
 }
 
 // delete a comment
 export const deleteComments = async (req, res) => {
-    const clerkId = req.auth.userId;
-    const id = req.params.id;
+    const user = req.user;
+    const commentId = req.params.id;
 
-    if (!clerkId) {
-        return res.status(401).json("Not authenticated!");
+    const comment = await Comment.findOne({
+        where: {
+            id: commentId,
+        },
+    });
+
+    if (!comment) {
+        return res.status(404).json("Comment not found");
     }
 
-    const role = req.auth.sessionClaims?.metadata?.role || "user";
-    if (role === "admin") {
+    if (user.role === "admin" || user.id === comment.userId) {
         try {
-            const deletedComment = await Comment.destroy({
+            await Comment.destroy({
                 where: {
-                    id: id,
+                    id: commentId,
                 }
             });
-    
-            if (deletedComment === 0) {
-                return res.status(403).json("You can't delete this comment!");
-            }
-    
+
             console.log("Comment deleted");
-            return res.status(200).json(deletedComment);
+            return res.status(200).json("Comment deleted");
         } catch(err) {
             console.log(err);
+            return res.status(400).json("An error has occured");
         }
     }
-
-    try {
-        const user = await User.findOne({
-            where: {
-                clerkId: clerkId,
-            },
-        });
-
-        const deletedComment = await Comment.destroy({
-            where: {
-                id: id,
-                userId: user.id,
-            }
-        });
-
-        if (deletedComment === 0) {
-            return res.status(403).json("You can't delete this comment!");
-        }
-
-        console.log("Comment deleted");
-        return res.status(200).json(deletedComment);
-    } catch(err) {
-        console.log(err);
-    }
+    return res.status(403).json("You don't have permission to delete this post!");
 }

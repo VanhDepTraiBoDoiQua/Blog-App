@@ -1,14 +1,13 @@
 import express from "express";
-import { getUserSavedPosts, savePost, getAllUsers, createUser } from "../controllers/user.controller.js";
+import { getUserSavedPosts, savePost, updateUser } from "../controllers/user.controller.js";
+import isAuth from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/saved", getUserSavedPosts);
+router.get("/saved", isAuth, getUserSavedPosts);
 
-router.patch("/save", savePost);
+router.patch("/save", isAuth, savePost);
 
-router.get("", getAllUsers);
-
-router.post("", createUser);
+router.patch("/", isAuth, updateUser);
 
 export default router;

@@ -25,7 +25,7 @@ const PostListItem = ({post}) => {
                     <span>{format(post.createdAt)}</span>
                 </div>
                 <p>
-                    {post.description.substring(0, 100)}{post.description.length > 100 && '...'}
+                    {/* {post.description.substring(0, 100)}{post.description.length > 100 && '...'} */}
                 </p>
                 <Link to={`/${post.slug}`} className="text-blue-400 underline">Read more</Link>
             </div>
