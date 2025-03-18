@@ -48,9 +48,9 @@ const SinglePostPage = () => {
                     <h1 className="text-xl md:text-3xl xl:text-4xl 2xl:text-5xl font-semibold">{data.title}</h1>
                     <div className="flex items-center gap-2 text-gray-400 text-sm">
                         <span>Written by</span>
-                        <Link className="text-blue-400">{data.User.username}</Link>
+                        <Link to={`/posts?author=${data.User.username}`} className="text-blue-400">{data.User.username}</Link>
                         <span>on</span>
-                        <Link className="text-blue-400">{data.category}</Link>
+                        <Link to={`/posts?cat=${data.category}`} className="text-blue-400">{data.category}</Link>
                         <span>{format(data.createdAt)}</span>
                     </div>
                     <p className="text-gray-400 font-medium">
@@ -76,9 +76,8 @@ const SinglePostPage = () => {
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-8">
                             <img src={data.User.img} className="w-12 h-12 rounded-full object-cover" width="48" height="48"/>
-                            <Link className="text-blue-400">{data.User.username}</Link>
+                            <Link to={`/posts?author=${data.User.username}`} className="text-blue-400">{data.User.username}</Link>
                         </div>
-                        <p className="text-sm text-gray-400">Lorem ipsum dolor sit amet consectetur, adipisicing elit.</p>
                         <div className="flex gap-2">
                             <Link>
                                 <Image src="facebook.svg"/>
@@ -91,12 +90,13 @@ const SinglePostPage = () => {
                     {isSignedIn && <PostMenuActions post={data}/>}
                     <h1 className="mt-8 mg-4 text-sm font-medium">Categories</h1>
                     <div className="flex flex-col gap-2 text-sm">
-                        <Link className="underline">All</Link>
-                        <Link className="underline">Web design</Link>
-                        <Link className="underline">Development</Link>
-                        <Link className="underline">Database</Link>
-                        <Link className="underline">Search engine</Link>
-                        <Link className="underline">Marketing</Link>
+                        <Link to="/posts" className="underline">All</Link>
+                        <Link to="/posts?cat=general" className="underline">General</Link>
+                        <Link to="/posts?cat=web-design" className="underline">Web design</Link>
+                        <Link to="/posts?cat=development" className="underline">Development</Link>
+                        <Link to="/posts?cat=database" className="underline">Database</Link>
+                        <Link to="/posts?cat=search-engine" className="underline">Search engine</Link>
+                        <Link to="/posts?cat=marketing" className="underline">Marketing</Link>
                     </div>
                     <h1 className="mt-8 mg-4 text-sm font-medium">Search</h1>
                     <Search/>

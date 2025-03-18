@@ -13,22 +13,22 @@ router.post("/login/email", emailLogin);
 router.post("/login/password", passwordLogin);
 
 // login with facebook
-router.get("/facebook", passport.authenticate("facebook"));
+router.get("/facebook", passport.authenticate("facebook-login"));
 
 // facebook callback
 router.get("/facebook/callback", 
-    passport.authenticate("facebook", {
+    passport.authenticate("facebook-login", {
         failureRedirect: `${process.env.CLIENT_URL}/login`,
     }),
     facebookCallback
 );
 
 // login with google
-router.get("/google", passport.authenticate("google"));
+router.get("/google", passport.authenticate("google-login"));
 
 // google callback
 router.get("/google/callback", 
-    passport.authenticate("google", {
+    passport.authenticate("google-login", {
         failureRedirect: `${process.env.CLIENT_URL}/login`,
     }),
     googleCallback

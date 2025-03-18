@@ -2,6 +2,9 @@ import { useState } from "react";
 import UpdateUsernameCard from "./UpdateUsernameCard.jsx";
 import UpdateProfileCard from "./UpdateProfileCard.jsx";
 import UpdatePasswordCard from "./UpdatePasswordCard.jsx";
+import { MdFacebook } from "react-icons/md";
+import { FcGoogle } from "react-icons/fc";
+import { GrGoogle } from "react-icons/gr";
 
 const UserSettingModal = ({onClose, user}) => {
     const [updateProfile, setUpdateProfile] = useState(false);
@@ -25,7 +28,6 @@ const UserSettingModal = ({onClose, user}) => {
         setUpdateUsername(false);
         setUpdatePassword(true);
     }
-    console.log(user);
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -92,6 +94,42 @@ const UserSettingModal = ({onClose, user}) => {
                             {updatePassword &&
                                 <UpdatePasswordCard setUpdatePassword={setUpdatePassword}/>
                             }
+                        </div>
+                    </div>
+
+                    {/* Connect Section */}
+                    <div className="flex items-center justify-between border-t pt-4">
+                        <p className="text-gray-500 font-semibold w-1/3">Connected Account</p>
+                        <div className="flex flex-row items-center gap-6 w-2/3">
+                            <div className="flex flex-col gap-2">
+                                {user.hasFacebook ? (
+                                    <div className="flex flex-row items-center gap-3 px-2">
+                                        <MdFacebook className="text-blue-500 w-8 h-8"/>
+                                        <span>Connected</span>
+                                    </div>
+                                ) : (
+                                    <a href={`${import.meta.env.VITE_API_URL}/users/connect/facebook`}>
+                                        <div className="flex flex-row items-center gap-3 px-2">
+                                            <MdFacebook className="w-8 h-8"/>
+                                            <button>Connect to Facebook Account</button>
+                                        </div>
+                                    </a>
+                                )}
+
+                                {user.hasGoogle ? (
+                                    <div className="flex flex-row items-center gap-3 px-2">
+                                        <FcGoogle className="w-8 h-8"/>
+                                        <span>Connected</span>
+                                    </div>
+                                ) : (
+                                    <a href={`${import.meta.env.VITE_API_URL}/users/connect/google`} >
+                                        <div className="flex flex-row items-center gap-3 px-2">
+                                            <GrGoogle className="w-8 h-8"/>
+                                            <button>Connect to Google Account</button>
+                                        </div>
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

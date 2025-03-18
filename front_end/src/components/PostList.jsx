@@ -2,27 +2,34 @@ import PostListItem from "./PostListItem";
 import {useQuery} from '@tanstack/react-query';
 import axios from 'axios';
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
-const fetchPosts = async(page) => {
+const fetchPosts = async(searchParams) => {
+    const searchParamsObj = Object.fromEntries([...searchParams]);
+    console.log(searchParamsObj);
+
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts`, {
-        params: {page},
+        params: {...searchParamsObj},
     });
     return res.data;
 }
 
 const PostList = () => {
-    const currentPage = sessionStorage.getItem('page') ? parseInt(sessionStorage.getItem('page')) : 1;
-    const [page, setPage] = useState(currentPage);
-
-    useEffect(() => {
-        sessionStorage.setItem('page', page);
-        window.scrollTo(0, 0);
-    }, [page]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const page = parseInt(searchParams.get("page")) || 1;
 
     const {isLoading, error, data} = useQuery({
-        queryKey: ['posts', page],
-        queryFn: () => fetchPosts(page),
+        queryKey: ['posts', searchParams.toString()],
+        queryFn: () => fetchPosts(searchParams),
     })
+
+    const handlePageChange = (newPage) => {
+        setSearchParams((prev) => {
+            const newParams = new URLSearchParams(prev.toString());
+            newParams.set("page", newPage);
+            return newParams;
+        })
+    }
 
     if (isLoading) return "Loading...";
 
@@ -35,11 +42,13 @@ const PostList = () => {
                     {data?.posts?.map(post => (
                         <PostListItem key={post.id} post={post}/>
                     ))}
+                    {data.posts.length === 0 && 
+                    <div className="">No post found, please try again.</div>}
                 </div>
                 <div className="bg-white text-blue-400 font-semibold items-center flex justify-between gap-10 my-10 mx-auto rounded-full w-fit px-5 py-3">
                     <button
                         className="disabled:text-gray-400 transition-all duration-200 hover:bg-blue-100 rounded-xl px-1 py-1"
-                        onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => {handlePageChange(Math.max(page - 1, 1))}}
                         disabled={page === 1}
                     >
                         Prev
@@ -47,7 +56,7 @@ const PostList = () => {
                     <span className="">Page {page}</span>
                     <button
                         className="disabled:text-gray-400 transition-all duration-200 hover:bg-blue-100 rounded-xl px-1 py-1"
-                        onClick={() => setPage(prev => prev + 1)}
+                        onClick={() => {handlePageChange(page + 1)}}
                         disabled={!data?.hasMore}
                     >
                         Next

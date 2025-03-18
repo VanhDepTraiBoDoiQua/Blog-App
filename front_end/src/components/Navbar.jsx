@@ -53,8 +53,8 @@ const NavBar = () => {
                     absolute top-16 bg-amber-100 transition-all ease-in-out gap-8 font-medium text-lg
                     ${openMenu ? ("-right-0") : ("-right-full")}`}>
                     <Link to="/home" onClick={() => setOpenMenu(false)}>Home</Link>
-                    <Link to="/" onClick={() => setOpenMenu(false)}>Trending</Link>
-                    <Link to="/" onClick={() => setOpenMenu(false)}>Popular</Link>
+                    <Link to="/posts?sortQuery=trending" onClick={() => setOpenMenu(false)}>Trending</Link>
+                    <Link to="//posts?sortQuery=popular" onClick={() => setOpenMenu(false)}>Popular</Link>
                     {role === "admin" && <Link to="/admin">Admin Page</Link>}
 
                     {isSignedIn ? (
@@ -70,8 +70,8 @@ const NavBar = () => {
             {/* DESKTOP MENU */}
             <div className="hidden md:flex items-center gap-8 xl:gap-12 font-medium">
                 <Link to="/home">Home</Link>
-                <Link to="/">Trending</Link>
-                <Link to="/">Popular</Link>
+                <Link to="/posts?sortQuery=trending">Trending</Link>
+                <Link to="/posts?sortQuery=popular">Popular</Link>
                 {role === "admin" && <Link to="/admin">Admin Page</Link>}
                 
                 {isSignedIn ? (

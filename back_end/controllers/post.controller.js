@@ -2,25 +2,105 @@ import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import ImageKit from "imagekit";
 import Comment from "../models/comment.model.js";
+import { Op } from "sequelize";
+
+const sanitizeInput = (input) => {
+    if (typeof input !== "string") return input;
+    return input.trim().replace(/[<>\/\\'"`]/g, "");
+}
+
 
 // get all post
 export const getPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
 
+    // filter
+    const query = {};
+
+    const cat = sanitizeInput(req.query.cat);
+    const author = sanitizeInput(req.query.author);
+    const searchQuery = sanitizeInput(req.query.searchQuery);
+    const sortQuery = sanitizeInput(req.query.sortQuery);
+    const featured = sanitizeInput(req.query.featured);
+
+    // category filter
+    if (cat) {
+        query.category = cat;
+    }
+
+    // author filter
+    if (author) {
+        const user = await User.findOne({
+            where: {
+                username: author,
+            },
+            attributes: ["id"],
+        });
+
+        if(!user) {
+            return res.status(404).json("Username not found");
+        }
+
+        query.userId = user.id;
+    }
+
+    // title filter
+    if (searchQuery) {
+        query.title = {[Op.like]: `%${searchQuery}%`};
+    }
+
+    // sort options
+    let sortOptions = ['createdAt', 'DESC'];
+
+    if (sortQuery) {
+        switch (sortQuery) {
+            case "newest":
+                sortOptions = ['createdAt', 'DESC'];
+                break;
+
+            case "oldest":
+                sortOptions = ['createdAt', 'ASC'];
+                break;
+
+            case "popular":
+                sortOptions = ['visit', 'DESC'];
+                break;
+
+            case "trending":
+                sortOptions = ['visit', 'DESC'];
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                query.createdAt = {
+                    [Op.gte]: new Date(today.getTime() - 7 *  24 * 60 * 60 * 1000),
+                };
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    if (featured) {
+        query.isFeatured = true;
+    }
+
     try {
         const posts = await Post.findAll({
             limit: limit,
             offset: (page - 1) * limit,
+            where: query,
             include: {
                 model: User,
                 attributes: ['username'],
             },
             order: [
-                ['createdAt', 'DESC']
-            ]
+                sortOptions,
+            ],
         });
-        const totalPosts = await Post.count();
+        const totalPosts = await Post.count({
+            where: query,
+        });
         const hasMore = (page * limit) < totalPosts;
         res.status(200).json({posts, hasMore});
     } catch(err) {

@@ -5,8 +5,6 @@ import authRouter from "./routes/auth.route.js";
 import commentRouter from "./routes/comment.route.js";
 import adminRouter from "./routes/admin.route.js";
 import { connectDB } from "./lib/connectDB.js";
-import webHookRouter from "./routes/webhook.route.js";
-import { clerkMiddleware } from "@clerk/express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "./strategy/strategy.js";
@@ -19,10 +17,6 @@ app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
 }));
-
-// clerk middleware for authentication
-app.use(clerkMiddleware());
-
 
 // all routes
 // use JSON for all routes below

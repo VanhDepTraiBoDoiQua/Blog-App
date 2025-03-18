@@ -2,15 +2,7 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
 const isAuth = async (req, res, next) => {
-	const header = req.headers.cookie.split('; ');
-	var token;
-	if (header) {
-		header.forEach(cookie => {
-			if (cookie.startsWith('auth_token=')) {
-				token = cookie.split('=')[1];
-			}
-		});
-	}
+	const token = req.cookies.auth_token;
 	
 	if (!token) {
 		return res.status(401).json("Unauthorized");

@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import SocialAccount from "../models/socialAcount.model.js";
 
 const tokenLife = process.env.TOKEN_LIFE;
 const tokenSecret = process.env.TOKEN_SECRET;
@@ -35,9 +36,7 @@ export const createUser = async (req, res) => {
         });
 
         console.log("User created!");
-        return res.status(200).json({
-            token: token
-        });
+        return res.status(200).redirect(`${process.env.CLIENT_URL}/login`);
 
     } catch(err) {
         console.log(err);
@@ -118,6 +117,21 @@ export const logoutUser = (req, res) => {
 export const getUser = async (req, res) => {
     const user = req.user;
 
+    const facebookAccount = await SocialAccount.count({
+        where: {
+            userId: user.id,
+            provider: "facebook",
+        },
+    });
+    
+
+    const googleAccount = await SocialAccount.count({
+        where: {
+            userId: user.id,
+            provider: "google",
+        },
+    });
+
     return res.status(200).json({
         id: user.id,
         email: user.email,
@@ -126,7 +140,9 @@ export const getUser = async (req, res) => {
         img: user.img,
         savedPost: user.savedPost,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        hasFacebook: facebookAccount > 0,
+        hasGoogle: googleAccount > 0,
     });
 }
 
@@ -138,7 +154,7 @@ export const facebookCallback = (req, res) => {
         {
             id: user.id,
         }, 
-        tokenSecret, 
+        tokenSecret,
         {
             expiresIn: tokenLife
         }

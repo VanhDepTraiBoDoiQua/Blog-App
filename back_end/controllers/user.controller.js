@@ -1,5 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"
+import SocialAccount from "../models/socialAcount.model.js";
 
 //get all saved posts
 export const getUserSavedPosts = async (req, res) => {
@@ -75,4 +77,56 @@ export const updateUser = async (req, res) => {
     } else {
         return res.status(400).json("An error has occured");
     }
+}
+
+export const connectFacebook = async (req, res, user) => {
+    const token = req.cookies.auth_token;
+    if (!token) {
+        return res.status(403).redirect(`${process.env.CLIENT_URL}/home`);
+    }
+
+    const verified = jwt.decode(token, process.env.TOKEN_SECRET);
+    if (!verified) {
+        return res.status(403).redirect(`${process.env.CLIENT_URL}/home`);
+    }
+
+    const findUser = await User.findOne({
+        where: {
+            id: verified.id,
+        }
+    })
+
+    await SocialAccount.create({
+        userId: findUser.id,
+        provider: "facebook",
+        providerUserId: user.id,
+    })
+
+    return res.status(200).redirect(`${process.env.CLIENT_URL}/home?success=${encodeURIComponent("Connect social account successfully!")}`);
+}
+
+export const connectGoogle = async (req, res, user) => {
+    const token = req.cookies.auth_token;
+    if (!token) {
+        return res.status(403).redirect(`${process.env.CLIENT_URL}/home`);
+    }
+
+    const verified = jwt.decode(token, process.env.TOKEN_SECRET);
+    if (!verified) {
+        return res.status(403).redirect(`${process.env.CLIENT_URL}/home`);
+    }
+
+    const findUser = await User.findOne({
+        where: {
+            id: verified.id,
+        }
+    })
+
+    await SocialAccount.create({
+        userId: findUser.id,
+        provider: "google",
+        providerUserId: user.id,
+    })
+
+    return res.status(200).redirect(`${process.env.CLIENT_URL}/home?success=${encodeURIComponent("Connect social account successfully!")}`);
 }

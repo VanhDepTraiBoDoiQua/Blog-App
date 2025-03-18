@@ -5,8 +5,8 @@ import SocialAccount from "../models/socialAcount.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt"
 
-// facebook strategy
-passport.use(new FacebookStrategy({
+// facebook login strategy
+passport.use("facebook-login", new FacebookStrategy({
         clientID: process.env.FACEBOOK_CLIENT_ID,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
         callbackURL: "/auth/facebook/callback",
@@ -17,6 +17,7 @@ passport.use(new FacebookStrategy({
         const account = await SocialAccount.findOne({
             where: {
                 providerUserId: profile.id,
+                provider: "facebook",
             },
         });
 
@@ -25,6 +26,7 @@ passport.use(new FacebookStrategy({
             let password = bcrypt.hashSync(Math.random().toString(36).slice(-8), 10);
             let email = profile.emails ? profile.emails[0].value : `user_${profile.id}@facebook.com`;
             let img = profile?.photos[0]?.value;
+            const username = `user_user_${profile.id}`
 
             const findByEmail = await User.findOne({
                 where: {
@@ -33,11 +35,11 @@ passport.use(new FacebookStrategy({
             });
 
             if (findByEmail) {
-                return resizeBy.status(400).json("This account has already exist");
+                return done(null, findByEmail);
             }
 
             const newUser = await User.create({
-                username: profile.displayName,
+                username: username,
                 password: password,
                 email: email,
                 img: img,
@@ -64,8 +66,33 @@ passport.use(new FacebookStrategy({
     },
 ));
 
-// google strategy
-passport.use(new GoogleStrategy({
+// facebook connect strategy
+passport.use("facebook-connect", new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: "/users/connect/facebook/callback",
+    scope: ['email', 'public_profile'],
+    profileFields: ['email', 'displayName', 'photos']
+
+}, async (accessToken, refreshToken, profile, done) => {
+    const account = await SocialAccount.findOne({
+        where: {
+            providerUserId: profile.id,
+            provider: "facebook",
+        },
+    });
+
+    if (!account) {
+        return done(null, profile);
+
+    } else {
+        return done(new Error("This social account has been already linked to another account"), false);
+    }
+},
+));
+
+// google login strategy
+passport.use("google-login", new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: "/auth/google/callback",
@@ -76,6 +103,7 @@ passport.use(new GoogleStrategy({
         const account = await SocialAccount.findOne({
             where: {
                 providerUserId: profile.id,
+                provider: "google",
             },
         });
 
@@ -83,6 +111,7 @@ passport.use(new GoogleStrategy({
             let password = bcrypt.hashSync(Math.random().toString(36).slice(-8), 10);
             let email = profile.emails[0].value;
             let img = profile?.photos[0]?.value;
+            const username = `user_user_${profile.id}`
 
             const findByEmail = await User.findOne({
                 where: {
@@ -91,11 +120,11 @@ passport.use(new GoogleStrategy({
             });
 
             if (findByEmail) {
-                return resizeBy.status(400).json("This account has already exist");
+                return done(null, findByEmail);
             }
 
             const newUser = await User.create({
-                username: profile.displayName,
+                username: username,
                 password: password,
                 email: email,
                 img: img,
@@ -119,6 +148,30 @@ passport.use(new GoogleStrategy({
             return done(null, user);
         }
     },
+));
+
+// google connect strategy
+passport.use("google-connect", new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "/users/connect/google/callback",
+        scope: ['profile', 'email']
+
+}, async (accessToken, refreshToken, profile, done) => {
+    const account = await SocialAccount.findOne({
+        where: {
+            providerUserId: profile.id,
+            provider: "google",
+        },
+    });
+
+    if (!account) {
+        return done(null, profile);
+
+    } else {
+        return done(new Error("This social account has been already linked to another account"), false);
+    }
+},
 ));
 
 export default passport;
