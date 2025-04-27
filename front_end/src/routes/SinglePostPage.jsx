@@ -32,8 +32,8 @@ const SinglePostPage = () => {
     })
 
     if (isPending) return "Loading...";
-    if (error) return "Something went wrong!" + error.message;
     if (!data) return <ErrorPage/>;
+    if (error) return "Something went wrong!" + error.message;
 
     const postContent = (content) => {
         const satinizedContent = DOMPurify.sanitize(content);

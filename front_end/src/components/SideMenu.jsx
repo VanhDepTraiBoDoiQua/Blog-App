@@ -1,8 +1,21 @@
 import Search from "./Search";
 import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const SideMenu = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const {isPending, error, data} = useQuery({
+        queryKey: ["categories"],
+        queryFn: () => {
+            return axios.get(`${import.meta.env.VITE_API_URL}/category`);
+        },
+    });
+
+    if (isPending) return "Loading...";
+
+    const categories = data?.data;
 
     const handleFilterChange = (e) => {
         if (searchParams.get("sort") !== e.target.value) {
@@ -52,12 +65,15 @@ const SideMenu = () => {
             <h1 className="mb-4 text-sm font-medium mt-8">Categories</h1>
             <div className="flex flex-col gap-2 text-sm">
                 <span className="underline cursor-pointer" onClick={() => handleCategoryChange("")}>All</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("general")}>General</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("web-design")}>Web design</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("development")}>Development</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("database")}>Database</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("search-engine")}>Search engine</span>
-                <span className="underline cursor-pointer" onClick={() => handleCategoryChange("marketing")}>Marketing</span>
+                {categories.map((category => (
+                    <span
+                        key={category.id}
+                        className="underline cursor-pointer" 
+                        onClick={() => handleCategoryChange(category.id)}
+                    >
+                        {category.name}
+                    </span>
+                )))}
             </div>
         </div>
     )

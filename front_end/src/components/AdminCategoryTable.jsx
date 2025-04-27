@@ -1,23 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import AdminPostItem from "./AdminPostItem";
 import { useState } from "react";
+import CreateNewCategory from "./CreateNewCategory";
+import AdminCategoryrItem from "./AdminCategoryItem";
 
-const AdminPostTable = () => {
+const AdminCategoryTable = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const [page, setPage] = useState(1);
-    const limit = 10;
 
     const {isPending, error, data} = useQuery({
-        queryKey: ["posts", page],
+        queryKey: ["categories", page],
         queryFn: () => {
-            return axios.get(`${import.meta.env.VITE_API_URL}/admin/posts`, {
-                params: {page, limit},
-                withCredentials:true,
+            return axios.get(`${import.meta.env.VITE_API_URL}/category`, {
+                params: {page},
+                withCredentials: true
             });
         },
     });
 
-    if (isPending) return ("Loading...");
+    if (isPending) return "Loading...";
 
     return (
         <>
@@ -27,23 +28,25 @@ const AdminPostTable = () => {
                     placeholder="Search..." 
                     className="px-4 py-2 border border-gray-300 rounded-xl outline-none"
                 />
+                <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-400 hover:bg-purple-300 text-white rounded-xl ml-auto">Add New</button>
+
+                {isOpen && <CreateNewCategory onClose={() => setIsOpen(false)}/>}
+
             </div>
             <div className="overflow-hidden rounded-2xl border border-gray-300 w-full">
                 <table className="table-auto border-separate border-spacing-0 w-full">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="border-b border-gray-300 px-4 py-2 w-1/3">Title</th>
-                            <th className="border-b border-gray-300 px-4 py-2">Category</th>
-                            <th className="border-b border-gray-300 px-4 py-2">Author</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Category Name</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Number of posts</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Updated at</th>
                             <th className="border-b border-gray-300 px-4 py-2">Created at</th>
-                            <th className="border-b border-gray-300 px-4 py-2">View count</th>
-                            <th className="border-b border-gray-300 px-4 py-2">Status</th>
                             <th className="border-b border-gray-300 px-4 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.data?.posts?.map((post) => (
-                            <AdminPostItem key={post.id} post= {post}/>
+                        {data?.data?.categories.map((category) => (
+                            <AdminCategoryrItem key={category.id} category={category}/>
                         ))}
                     </tbody>
                 </table>
@@ -69,4 +72,4 @@ const AdminPostTable = () => {
     )
 }
 
-export default AdminPostTable;
+export default AdminCategoryTable;

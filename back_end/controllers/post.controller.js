@@ -18,6 +18,8 @@ export const getPosts = async (req, res) => {
     // filter
     const query = {};
 
+    query.status = "published";
+
     const cat = sanitizeInput(req.query.cat);
     const author = sanitizeInput(req.query.author);
     const searchQuery = sanitizeInput(req.query.searchQuery);
@@ -26,7 +28,7 @@ export const getPosts = async (req, res) => {
 
     // category filter
     if (cat) {
-        query.category = cat;
+        query.categoryId = cat;
     }
 
     // author filter
@@ -114,6 +116,7 @@ export const getPost = async (req, res) => {
         const post = await Post.findOne({
             where: {
                 slug: req.params.slug,
+                status: "published"
             },
             include: {
                 model: User,

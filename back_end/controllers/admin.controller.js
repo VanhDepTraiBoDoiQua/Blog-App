@@ -1,3 +1,6 @@
+import { sequelize } from "../lib/connectDB.js";
+import Category from "../models/category.model.js";
+import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
@@ -70,4 +73,103 @@ export const createUser = async(req, res) => {
         }
     }
     return res.status(403).json("Forbidden!");
+}
+
+// admin get all posts
+export const getAllPosts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    // filter
+    const query = {};
+
+    try {
+        const posts = await Post.findAll({
+            limit: limit,
+            offset: (page - 1) * limit,
+            where: query,
+            include: {
+                model: User,
+                attributes: ['username'],
+            },
+            order: [['createdAt', 'DESC']],
+        });
+        const totalPosts = await Post.count({
+            where: query,
+        });
+        const hasMore = (page * limit) < totalPosts;
+        res.status(200).json({posts, hasMore});
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const publishPost = async (req, res) => {
+    const user = req.user;
+
+    if (user.role !== "admin") {
+        return res.status(403).json("Not authorized!");
+    }
+
+    try {
+        const post = await Post.findOne({
+            where: {
+                id: req.body.postId,
+            },
+        });
+    
+        if (!post) {
+            return res.status(404).json("Post not found");
+        }
+    
+        if (post.status === "published") {
+            post.status = "pending";
+        } else {
+            post.status = "published";
+        }
+        
+        await post.save();
+
+        res.status(200).json(post);
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const getAllCategories = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    // filter
+    const query = {};
+
+    try {
+        const categories = await Category.findAll({
+            limit: limit,
+            offset: (page - 1) * limit,
+            where: query,
+            order: [['createdAt', 'DESC']],
+            include: [
+                {
+                    model: Post,
+                    attributes: [],
+                    required: false,
+                }
+            ],
+            attributes: {
+                include: [
+                    [sequelize.fn('COUNT', sequelize.col('Posts.id')), 'posts']
+                ]
+            },
+            group: ['Category.id'],
+            subQuery: false
+        });
+        const totaCategories = await Category.count({
+            where: query,
+        });
+        const hasMore = (page * limit) < totaCategories;
+        res.status(200).json({categories, hasMore});
+    } catch(err) {
+        console.log(err);
+    }
 }

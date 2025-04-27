@@ -2,6 +2,7 @@ import { sequelize } from "../lib/connectDB.js";
 import { DataTypes } from "sequelize";
 import User from "./user.model.js";
 import Comment from "./comment.model.js";
+import Category from "./category.model.js";
 
 const Post = sequelize.define(
     'Post', 
@@ -26,9 +27,13 @@ const Post = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        category: {
-            type: DataTypes.STRING,
-            defaultValue: "general",
+        categoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "Category",
+                key: "id",
+            },
         },
         slug: {
             type: DataTypes.STRING,
@@ -41,6 +46,11 @@ const Post = sequelize.define(
         content: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        status: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            defaultValue: "pending",
         },
         isFeatured: {
             type: DataTypes.BOOLEAN,
@@ -61,6 +71,12 @@ Post.belongsTo(User, {
 Post.hasMany(Comment, {
     foreignKey: "postId",
     onDelete: "CASCADE",
+});
+Category.hasMany(Post, {
+    foreignKey: "categoryId",
+});
+Post.belongsTo(Category, {
+    foreignKey: "categoryId",
 });
 Comment.belongsTo(User, {
     foreignKey: "userId",

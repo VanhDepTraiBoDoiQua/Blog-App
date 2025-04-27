@@ -28,14 +28,19 @@ export const increaseVisit = async(req, res, next) => {
         const post = await Post.findOne({
             where: {
                 slug: slug,
+                status: "published",
             },
         });
+        
+        if (!post) {
+            return res.status(404).json("Post not found");
+        }
 
         post.increment("visit");
 
         next();
     } catch(err) {
         console.log(err);
-        return res.status(404).json("Post not found");
+        return res.status(400).json("An error has occured");
     }
 }

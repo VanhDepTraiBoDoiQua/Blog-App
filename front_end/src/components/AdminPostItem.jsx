@@ -1,4 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AdminPostItem = ({post}) => {
     const createdAt = new Date(post.createdAt).toLocaleDateString("en-US", { 
@@ -7,6 +10,28 @@ const AdminPostItem = ({post}) => {
         day: "numeric", 
         timeZone: "Asia/Ho_Chi_Minh" 
     });
+
+    const queryClient = useQueryClient();
+
+    const statusMutation = useMutation({
+        mutationFn: () => {
+            return axios.patch(`${import.meta.env.VITE_API_URL}/admin/publish`, {
+                postId: post.id,
+            }, {withCredentials: true});
+        },
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey:["posts"]})
+        },
+
+        onError: (error) => {
+            toast.error(error.response.data);
+        }
+    })
+
+    const handleChangeStatus = () => {
+        statusMutation.mutate();
+    }
 
     return (
         <tr className="text-center text-gray-700 hover:bg-[hwb(48_86%_2%)]">
@@ -19,6 +44,7 @@ const AdminPostItem = ({post}) => {
             <td className="border-b border-gray-300 px-4 py-2">{post.User.username}</td>
             <td className="border-b border-gray-300 px-4 py-2">{createdAt}</td>
             <td className="border-b border-gray-300 px-4 py-2">{post.visit}</td>
+            <td onClick={handleChangeStatus} className="border-b border-gray-300 px-4 py-2 cursor-pointer hover:underline">{post.status}</td>
             <td className="border-b border-gray-300 px-4 py-2">
                 <div className="flex items-center justify-center gap-4">
                     <span className="cursor-pointer" title="Delete">

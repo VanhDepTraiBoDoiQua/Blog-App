@@ -43,8 +43,8 @@ const Write = () => {
         },
 
         onSuccess: (res) => {
-            toast.success("Your post has been created!");
-            navigate(`/${res.data.slug}`);
+            toast.success("Your post has been submitted!");
+            navigate(`/home`);
         },
 
         onError: () => {

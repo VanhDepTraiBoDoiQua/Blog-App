@@ -4,6 +4,7 @@ import postRouter from "./routes/post.route.js";
 import authRouter from "./routes/auth.route.js";
 import commentRouter from "./routes/comment.route.js";
 import adminRouter from "./routes/admin.route.js";
+import categoryRouter from "./routes/category.route.js";
 import { connectDB } from "./lib/connectDB.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -52,6 +53,7 @@ app.use("/users", userRouter);
 app.use("/posts", postRouter);
 app.use("/comments", commentRouter);
 app.use("/admin", adminRouter);
+app.use("/category", categoryRouter);
 // all routes
 
 // error handler
