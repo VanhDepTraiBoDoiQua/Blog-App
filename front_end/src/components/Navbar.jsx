@@ -55,7 +55,7 @@ const NavBar = () => {
                     <Link to="/home" onClick={() => setOpenMenu(false)}>Home</Link>
                     <Link to="/posts?sortQuery=trending" onClick={() => setOpenMenu(false)}>Trending</Link>
                     <Link to="//posts?sortQuery=popular" onClick={() => setOpenMenu(false)}>Popular</Link>
-                    {role === "admin" && <Link to="/admin">Admin Page</Link>}
+                    {/* {role === "admin" && <Link to="/admin">Admin Page</Link>} */}
 
                     {isSignedIn ? (
                         <AvatarDropdown/>
@@ -72,7 +72,7 @@ const NavBar = () => {
                 <Link to="/home">Home</Link>
                 <Link to="/posts?sortQuery=trending">Trending</Link>
                 <Link to="/posts?sortQuery=popular">Popular</Link>
-                {role === "admin" && <Link to="/admin">Admin Page</Link>}
+                {/* {role === "admin" && <Link to="/admin">Admin Page</Link>} */}
                 
                 {isSignedIn ? (
                     <AvatarDropdown/>

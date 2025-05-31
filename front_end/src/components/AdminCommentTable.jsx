@@ -2,16 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
 import CreateNewCategory from "./CreateNewCategory";
-import AdminCategoryrItem from "./AdminCategoryItem";
+import AdminCommentItem from "./AdminCommentItem";
 
-const AdminCategoryTable = () => {
+const AdminCommentTable = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [page, setPage] = useState(1);
 
     const {isPending, error, data} = useQuery({
-        queryKey: ["categories", page],
+        queryKey: ["comments", page],
         queryFn: () => {
-            return axios.get(`${import.meta.env.VITE_API_URL}/admin/category`, {
+            return axios.get(`${import.meta.env.VITE_API_URL}/admin/comment`, {
                 params: {page},
                 withCredentials: true
             });
@@ -28,25 +28,26 @@ const AdminCategoryTable = () => {
                     placeholder="Search..." 
                     className="px-4 py-2 border border-gray-300 rounded-xl outline-none"
                 /> */}
-                <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-400 hover:bg-purple-300 text-white rounded-xl ml-auto">Add New</button>
+                {/* <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-400 hover:bg-purple-300 text-white rounded-xl ml-auto">Add New</button>
 
-                {isOpen && <CreateNewCategory onClose={() => setIsOpen(false)}/>}
+                {isOpen && <CreateNewCategory onClose={() => setIsOpen(false)}/>} */}
 
             </div>
             <div className="overflow-hidden rounded-2xl border border-gray-300 w-full">
                 <table className="table-auto border-separate border-spacing-0 w-full">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="border-b border-gray-300 px-4 py-2">Category Name</th>
-                            <th className="border-b border-gray-300 px-4 py-2">Number of posts</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Username</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Post</th>
+                            <th className="border-b border-gray-300 px-4 py-2">Comment</th>
                             <th className="border-b border-gray-300 px-4 py-2">Updated at</th>
                             <th className="border-b border-gray-300 px-4 py-2">Created at</th>
                             <th className="border-b border-gray-300 px-4 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.data?.categories.map((category) => (
-                            <AdminCategoryrItem key={category.id} category={category}/>
+                        {data?.data?.comments.map((comment) => (
+                            <AdminCommentItem key={comment.id} comment={comment}/>
                         ))}
                     </tbody>
                 </table>
@@ -72,4 +73,4 @@ const AdminCategoryTable = () => {
     )
 }
 
-export default AdminCategoryTable;
+export default AdminCommentTable;

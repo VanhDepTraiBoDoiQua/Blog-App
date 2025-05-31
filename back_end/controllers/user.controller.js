@@ -2,6 +2,9 @@ import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import SocialAccount from "../models/socialAcount.model.js";
+import Post from "../models/post.model.js";
+import Comment from "../models/comment.model.js";
+import { sequelize } from "../lib/connectDB.js";
 
 //get all saved posts
 export const getUserSavedPosts = async (req, res) => {
@@ -129,4 +132,81 @@ export const connectGoogle = async (req, res, user) => {
     })
 
     return res.status(200).redirect(`${process.env.CLIENT_URL}/home?success=${encodeURIComponent("Connect social account successfully!")}`);
+}
+
+export const deleteUser = async(req, res) => {
+    const user = req.user;
+
+    if (user.role !== "admin") {
+        return res.status(403).json("Not authorized!");
+    } 
+
+    const userId = req.params.id;
+
+    const findById = await User.findOne({
+        where: {
+            id: userId,
+        }
+    });
+    if (!findById) {
+        return res.status(404).json("User not found");
+    }
+
+    const t = await sequelize.transaction();
+
+    try {
+        const allPosts =  await Post.findAll({
+            where: {
+                userId: userId,
+            },
+            transaction: t,
+        });
+
+        for (const post of allPosts) {
+            await Comment.destroy({
+                where: {
+                    postId: post.id,
+                },
+                transaction: t,
+            });
+        }
+
+        await Comment.destroy({
+            where: {
+                userId: userId,
+            },
+            transaction: t,
+        });
+
+        await Post.destroy({
+            where: {
+                userId: userId,
+            },
+            transaction: t,
+        });
+
+        await SocialAccount.destroy({
+            where: {
+                userId: userId,
+            },
+            transaction: t,
+        });
+
+        await User.destroy({
+            where: {
+                id: userId,
+            },
+            transaction: t,
+        });
+
+        await t.commit();
+
+        console.log("User deleted");
+        return res.status(200).json("Deleted");
+    
+    } catch (err) {
+        await t.rollback();
+        console.log(err);
+        return res.status(400).json("An error has occured!");
+    }
 }

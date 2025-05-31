@@ -22,11 +22,11 @@ const AdminPostTable = () => {
     return (
         <>
             <div className="flex items-center gap-4 mb-2 w-full">
-                <input 
+                {/* <input 
                     type="text" 
                     placeholder="Search..." 
                     className="px-4 py-2 border border-gray-300 rounded-xl outline-none"
-                />
+                /> */}
             </div>
             <div className="overflow-hidden rounded-2xl border border-gray-300 w-full">
                 <table className="table-auto border-separate border-spacing-0 w-full">

@@ -1,5 +1,5 @@
 import express from "express";
-import { getPosts, getPost, createPost, deletePost, uploadAuth, featurePost } from "../controllers/post.controller.js";
+import { getPosts, getPost, createPost, deletePost, uploadAuth, featurePost, editPost } from "../controllers/post.controller.js";
 import isAuth from "../middlewares/auth.middleware.js";
 import { increaseVisit } from "../middlewares/increaseVisit.middleware.js";
 
@@ -23,5 +23,6 @@ router.delete("/:id", isAuth, deletePost);
 // feature a post
 router.patch("/feature", isAuth, featurePost);
 
+router.patch("/edit/:id", isAuth, editPost);
 
 export default router;

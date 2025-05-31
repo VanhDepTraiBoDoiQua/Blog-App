@@ -9,6 +9,7 @@ import Upload from "../components/Upload";
 import Progress from "../components/Progress";
 import Image from "../components/Image";
 import { isAuth } from "../auth/auth.js";
+import { useQuery } from "@tanstack/react-query";
 
 const Write = () => {
     const isSignedIn = isAuth();
@@ -34,6 +35,15 @@ const Write = () => {
         [{ 'align': [] }],
         ['clean']                                         // remove formatting button
     ]
+
+    const {isPending, error, data} = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            return await axios.get(`${import.meta.env.VITE_API_URL}/category`);
+        },
+    });
+
+    const categories = data?.data;
 
     const mutation = useMutation({
         mutationFn: (newPost) => {
@@ -92,6 +102,7 @@ const Write = () => {
         }
     }, [isSignedIn, navigate]);
 
+    if (categories) 
     return (
         <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
             <h1 className="text-xl font-light">Create a new post</h1>
@@ -111,12 +122,14 @@ const Write = () => {
                 <div className="flex items-center gap-4">
                     <label className="text-sm" htmlFor="">Category:</label>
                     <select name="category" id="" className="p-2 rounded-xl bg-white shadow-md outline-none">
-                        <option value="general">General</option>
-                        <option value="web-design">Web design</option>
-                        <option value="development">Development</option>
-                        <option value="search-engine">Search engine</option>
-                        <option value="database">Database</option>
-                        <option value="marketing">Marketing</option>
+                        {categories.map((category) => (
+                            <option 
+                                key={category.id}
+                                value={category.id}
+                                >
+                                    {category.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <textarea name="description" placeholder="Description" className="p-4 rounded-xl bg-white shadow-md outline-none"/>

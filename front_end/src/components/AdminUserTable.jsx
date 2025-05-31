@@ -23,11 +23,11 @@ const AdminUserTable = () => {
     return (
         <>
             <div className="flex items-center gap-4 mb-2 w-full">
-                <input 
+                {/* <input 
                     type="text" 
                     placeholder="Search..." 
                     className="px-4 py-2 border border-gray-300 rounded-xl outline-none"
-                />
+                /> */}
                 <button onClick={() => setIsOpen(true)} className="px-4 py-2 bg-purple-400 hover:bg-purple-300 text-white rounded-xl ml-auto">Add New</button>
 
                 {isOpen && <CreateUserModal onClose={() => setIsOpen(false)}/>}

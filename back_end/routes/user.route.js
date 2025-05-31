@@ -1,5 +1,5 @@
 import express from "express";
-import { getUserSavedPosts, savePost, updateUser, connectFacebook, connectGoogle } from "../controllers/user.controller.js";
+import { getUserSavedPosts, savePost, updateUser, connectFacebook, connectGoogle, deleteUser } from "../controllers/user.controller.js";
 import isAuth from "../middlewares/auth.middleware.js";
 import passport from "../strategy/strategy.js"
 
@@ -42,5 +42,7 @@ router.get("/connect/google/callback", (req, res, next) => {
         return connectGoogle(req, res, user);
     })(req, res, next);
 }, );
+
+router.delete("/:id", isAuth, deleteUser);
 
 export default router;

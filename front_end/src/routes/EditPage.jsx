@@ -1,0 +1,209 @@
+import 'react-quill-new/dist/quill.snow.css';
+import ReactQuill from "react-quill-new";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useEffect, useState, } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import Upload from "../components/Upload";
+import Progress from "../components/Progress";
+import Image from "../components/Image";
+import { isAuth } from "../auth/auth.js";
+import { useQuery } from "@tanstack/react-query";
+import ErrorPage from "../routes/ErrorPage";
+import { getUser } from "../auth/auth.js";
+
+const fetchPost = async (slug) => {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+    return res.data;
+}
+
+const EditPage = () => {
+
+    const user = getUser();
+
+    const {slug} = useParams();
+
+    const {isPending, error, data} = useQuery({
+        queryKey: ["categories"],
+        queryFn: async () => {
+            return await axios.get(`${import.meta.env.VITE_API_URL}/category`);
+        },
+    });
+
+    const categories = data?.data;
+
+    const {isPending: postPending, error: postError, data: postData} = useQuery({
+        queryKey: ["post", slug],
+        queryFn: () => fetchPost(slug),
+    })
+
+    const isSignedIn = isAuth();
+    const [value, setValue] = useState("");
+    const [cover, setCover] = useState("");
+    const [image, setImage] = useState("");
+    const [video, setVideo] = useState("");
+    const [title, setTitle] = useState("");
+    const [desc, setDesc] = useState("");
+    const [progress, setProgress] = useState(0);
+    const navigate = useNavigate();
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+        ['link', 'formula'],
+        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+        ['clean']                                         // remove formatting button
+    ]
+
+    // TODO: CHANGE LATER
+    const mutation = useMutation({
+        mutationFn: (data) => {
+            return axios.patch(`${import.meta.env.VITE_API_URL}/posts/edit/${postData.id}`, 
+                data, 
+            {withCredentials: true});
+        },
+
+        onSuccess: (res) => {
+            toast.success("Your post has been submitted!");
+            navigate(`/home`);
+        },
+
+        onError: () => {
+            toast.error("An error has occured!");
+        }
+    })
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // get data from form
+        const formData = new FormData(e.target);
+        console.log(cover.filePath);
+        const data = {
+            image: cover.filePath || postData.image,
+            title: formData.get("title"),
+            category: formData.get("category"),
+            description: formData.get("description"),
+            content: value,
+        }
+
+        if (data.title && data.category && data.description && data.content) {
+            // send data to back-end
+            mutation.mutate(data);
+        } else {
+            toast.error("Your post must contain Cover, Title, Description and Content!!");
+        }
+
+    }
+
+    useEffect(()=> {
+        image && setValue(prev => prev + `<p><img src="${image.url}"/></p>`)
+    }, [image])
+
+    useEffect(()=> {
+        video && setValue(prev => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`)
+    }, [video])
+
+    useEffect(()=> {
+        cover && setCover(cover);
+    }, [cover])
+
+    useEffect(() => {
+        if (!isSignedIn) {
+            navigate("/login");
+        }
+    }, [isSignedIn, navigate]);
+
+    useEffect(() => {
+        if (postData?.userId !== user.id) {
+            toast.error("You do not have permission to edit this post!");
+            navigate("/home");
+        }
+        if (postData) {
+            setValue(postData.content);
+            setDesc(postData.description);
+            setTitle(postData.title);
+        }
+    }, [postData]);
+
+    if (categories && postData) {
+        return (
+            <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
+                <h1 className="text-xl font-light">Create a new post</h1>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
+                    <Upload type="image" setProgress={setProgress} setData={setCover}>
+                        <button className="w-max p-2 shadow-md rounded-xl text-sm text-gray-400 bg-white" type="button">Add cover</button>
+                    </Upload>
+                    <Image src={cover.filePath} className="rounded-2xl object-cover" w="200" h ="200"/>
+                    <input 
+                        name="title" 
+                        className="text-4xl font-semibold bg-transparent outline-none" 
+                        type="text" 
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <div className="flex items-center gap-4">
+                        <label className="text-sm" htmlFor="">Category:</label>
+                        <select name="category" id="" className="p-2 rounded-xl bg-white shadow-md outline-none">
+                            {categories.map((category) => (
+                                <option 
+                                    key={category.id}
+                                    value={category.id}
+                                    >
+                                        {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <textarea 
+                        name="description" 
+                        className="p-4 rounded-xl bg-white shadow-md outline-none"
+                        value={desc}
+                        onChange={(e) => setDesc(e.target.value)}
+                    />
+                    <div className="flex flex-1">
+                        <div className="flex flex-col gap-2 mr-2">
+                            <Upload type="image" setProgress={setProgress} setData={setImage}>
+                                <div className="cursor-pointer">🖼️</div>
+                            </Upload>
+                            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+                                <div className="cursor-pointer">📽️</div>
+                            </Upload>
+                        </div>
+                        <ReactQuill 
+                            value={value} 
+                            onChange={setValue} 
+                            theme="snow" 
+                            className="flex-1 rounded-xl bg-white shadow-md" 
+                            readOnly={0 < progress && progress < 100}
+                            modules={{
+                                toolbar: toolbarOptions,
+                            }}
+                        />
+                    </div>
+                    <div className="flex items-center justify-between w-full">
+                        <Progress progress={progress}/>
+                        <button disabled={mutation.isPending || (0 < progress && progress < 100)} className="bg-blue-400 text-white 
+                        font-medium rounded-xl mt-4 p-2 w-36 ml-auto transition-all duration-200 hover:-translate-y-1 hover:shadow-lg
+                        disabled:bg-gray-400 disabled:cursor-not-allowed active:scale-95 hover:bg-blue-500">
+                            {mutation.isPending ? "Loading..." : "Upload"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+
+    return <ErrorPage/>;
+}
+
+export default EditPage;

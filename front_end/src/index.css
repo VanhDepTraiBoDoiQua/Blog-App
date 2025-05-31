@@ -24,3 +24,46 @@ body{
 .ql-editor {
     border: none !important;
 }
+
+.swiper-button-next, .swiper-button-prev {
+    opacity: 0; /* Ẩn nút điều hướng */
+    pointer-events: none; /* Ngừng tương tác với nút khi không hover */
+    transition: opacity 0.3s ease; /* Hiệu ứng chuyển đổi khi hover */
+}
+
+.swiper:hover .swiper-button-next, .swiper:hover .swiper-button-prev {
+    opacity: 1; /* Hiển thị nút khi hover */
+    pointer-events: auto; /* Cho phép tương tác với nút khi hover */
+}
+
+/* Container của pagination */
+.swiper-pagination {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 6px !important;
+    /* background-color: aqua; */
+    border-radius: 9999px; /* bo tròn dạng pill */
+    gap: 6px !important;
+    /* width: fit-content !important; */
+    margin: auto !important;
+  }
+  
+  /* Các chấm nhỏ */
+  .swiper-pagination-bullet {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    opacity: 1 !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  /* Chấm active thành viên thuốc */
+  .swiper-pagination-bullet-active {
+    width: 24px !important;
+    background-color: rgb(224, 208, 208) !important;
+    border-radius: 9999px !important;
+  }
+
+  

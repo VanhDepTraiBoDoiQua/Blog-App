@@ -28,7 +28,6 @@ export const increaseVisit = async(req, res, next) => {
         const post = await Post.findOne({
             where: {
                 slug: slug,
-                status: "published",
             },
         });
         

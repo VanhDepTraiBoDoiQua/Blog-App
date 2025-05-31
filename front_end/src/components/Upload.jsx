@@ -42,7 +42,7 @@ const Upload = ({children, type, setProgress, setData}) => {
         <IKContext 
             publicKey={import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY} 
             urlEndpoint={import.meta.env.VITE_API_URL} 
-            authenticator={authenticator} 
+            authenticator={authenticator}
         >
             <IKUpload
                 useUniqueFileName

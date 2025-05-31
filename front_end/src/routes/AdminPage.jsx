@@ -4,6 +4,7 @@ import AdminPostTable from "../components/AdminPostTable";
 import AdminCategoryTable from "../components/AdminCategoryTable.jsx";
 import ErrorPage from "./ErrorPage";
 import { getUser } from "../auth/auth.js";
+import AdminCommentTable from "../components/AdminCommentTable.jsx";
 
 const AdminPage = () => {
     const user = getUser()
@@ -26,7 +27,7 @@ const AdminPage = () => {
                         <AdminPostTable/>
                     )}
                     {selected === "comments" && (
-                        <AdminCategoryTable/>
+                        <AdminCommentTable/>
                     )}
                     {selected === "categories" && (
                         <AdminCategoryTable/>

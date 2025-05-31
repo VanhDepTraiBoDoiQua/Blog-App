@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import LandingPage from './routes/LandingPage.jsx';
 import ErrorPage from './routes/ErrorPage.jsx';
 import AdminPage from './routes/AdminPage.jsx';
+import EditPage from './routes/EditPage.jsx';
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: "/:slug",
         element: <SinglePostPage/>
+      },
+      {
+        path: "/edit/:slug",
+        element: <EditPage/>
       },
       {
         path: "*",

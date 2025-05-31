@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import ImageKit from "imagekit";
 import Comment from "../models/comment.model.js";
 import { Op } from "sequelize";
+import Category from "../models/category.model.js";
 
 const sanitizeInput = (input) => {
     if (typeof input !== "string") return input;
@@ -92,10 +93,16 @@ export const getPosts = async (req, res) => {
             limit: limit,
             offset: (page - 1) * limit,
             where: query,
-            include: {
-                model: User,
-                attributes: ['username'],
-            },
+            include: [
+                {
+                    model: User,
+                    attributes: ['username'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'name'],
+                }
+            ],
             order: [
                 sortOptions,
             ],
@@ -116,15 +123,17 @@ export const getPost = async (req, res) => {
         const post = await Post.findOne({
             where: {
                 slug: req.params.slug,
-                status: "published"
             },
-            include: {
-                model: User,
-                attributes: [
-                    'username', 
-                    'img'
-                ],
-            },
+            include: [
+                {
+                    model: User,
+                    attributes: ['username', 'img'],
+                },
+                {
+                    model: Category,
+                    attributes: ['id', 'name'],
+                }
+            ],
         });
         res.status(200).json(post);
     } catch (err) {
@@ -165,6 +174,7 @@ export const createPost = async (req, res) => {
         const post = await Post.create({
             userId: user.id,
             slug: slug,
+            categoryId: req.body.category,
             ...req.body,
         });
 
@@ -182,7 +192,7 @@ export const deletePost = async (req, res) => {
 
     const post = await Post.findOne({
         where: {
-            postId: req.params.id,
+            id: req.params.id,
         }
     });
 
@@ -200,7 +210,7 @@ export const deletePost = async (req, res) => {
 
             await Post.destroy({
                 where: {
-                    postId: req.params.id,
+                    id: req.params.id,
                 }
             });
 
@@ -249,4 +259,40 @@ const imagekit = new ImageKit({
 export const uploadAuth = async(req, res) => {
     const result = imagekit.getAuthenticationParameters();
     res.send(result);
+}
+
+export const editPost = async (req, res) => {
+    const user = req.user;
+
+    try {
+        const post = await Post.findOne({
+            where: {
+                id: req.params.id,
+            },
+        });
+
+        if (!post) {
+            return res.status(404).json("Not found");
+        }
+    
+        if (post.userId !== req.user.id) {
+            return res.status(401).json("Not authorized!");
+        }
+
+        post.image = req.body.image;
+        post.title = req.body.title;
+        post.categoryId = req.body.category;
+        post.description = req.body.description;
+        post.content = req.body.content;
+        post.status = "pending";
+
+        await post.save();
+
+        console.log("Post edited");
+        return res.status(200).json("OK");
+
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json("An error has occured");
+    }
 }

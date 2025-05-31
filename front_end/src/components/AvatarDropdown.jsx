@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { IoIosSettings } from "react-icons/io";
 import { PiSignOutBold } from "react-icons/pi";
 import UserSettingModal from './UserSettingModal.jsx';
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 const AvatarDropdown = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -51,7 +52,7 @@ const AvatarDropdown = () => {
             <div className="relative inline-block">
                 {/* Avatar */}
                 <img
-                    src={user?.img}
+                    src={user.img}
                     onClick={toggleDropdown}
                     className="mx-auto w-10 h-10 rounded-full object-cover cursor-pointer border border-gray-300"
                     width="10"
@@ -80,6 +81,17 @@ const AvatarDropdown = () => {
                             </span>
 
                             {userModal && <UserSettingModal user={user} onClose={() => setUserModal(false)}/>}
+
+                            {role === "admin" &&
+                                <Link
+                                    to="/admin"
+                                    className="flex items-center px-7 py-3 hover:bg-gray-100 cursor-pointer border-b gap-6"
+                                >
+                                    <IoIosSettings/>
+                                    Admin Page
+                                </Link>
+                            }
+                            
 
                             <span
                                 onClick={handleLogout}

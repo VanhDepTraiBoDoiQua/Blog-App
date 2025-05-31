@@ -7,7 +7,7 @@ const PostListPage = () => {
 
     return (
         <div className="">
-            <h1 className="mb-8 text-2xl">Development blog</h1>
+            <h1 className="mb-8 text-2xl"></h1>
             <button className="mb-4 bg-blue-400 text-sm text-white px-4 py-2 rounded-2xl md:hidden" onClick={() => setOpenMenu((prev) => !prev)}>
                 {openMenu ? ("Close") : ("Filter or search")}
             </button>
